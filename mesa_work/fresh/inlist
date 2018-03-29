@@ -1,0 +1,28 @@
+&star_job
+
+    read_extra_star_job_inlist1 = .true.
+    extra_star_job_inlist1_name = '/home/ADF/ballwh/work/artificial_tess/mesa_work/inlist_common'
+
+    read_extra_star_job_inlist2 = .true.
+    extra_star_job_inlist2_name = 'inlist_run'
+
+/ ! end of star_job namelist
+
+
+&controls
+
+    read_extra_controls_inlist1 = .true.
+    extra_controls_inlist1_name = '/home/ADF/ballwh/work/artificial_tess/mesa_work/inlist_common'
+
+    read_extra_controls_inlist2 = .true.
+    extra_controls_inlist2_name = 'inlist_run'
+
+/ ! end of controls namelist
+
+
+&pgstar
+
+    read_extra_pgstar_inlist1 = .true.
+    extra_pgstar_inlist1_name = '/home/ADF/ballwh/work/artificial_tess/mesa_work/inlist_common'
+
+/ ! end of pgstar namelist

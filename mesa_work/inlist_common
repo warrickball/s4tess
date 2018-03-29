@@ -1,0 +1,145 @@
+&star_job
+    create_pre_main_sequence_model = .true.
+    pre_ms_relax_num_steps = 50
+    pre_ms_T_c = 5e5
+
+    write_profile_when_terminate = .true.
+    filename_for_profile_when_terminate = 'final.profile'
+
+    pgstar_flag = .false.
+
+    change_net = .true. ! switch nuclear reaction network 
+    new_net_name = 'pp_extras.net' !'cno_extras_o18_ne22.net'
+    eos_file_prefix = 'mesa'
+    kappa_file_prefix ='gn93'
+    kappa_lowT_prefix = 'lowT_fa05_gn93' ! for lower temperatures.
+    initial_zfracs = 2 ! GN93_zfracs = 2 
+    set_rates_preference = .true.
+    new_rates_preference = 1 
+/ !end of star_job namelist
+
+
+&controls
+    write_pulse_info_with_profile = .true.
+    pulse_info_format = 'FGONG'
+    add_atmosphere_to_pulse_info = .true.
+
+    photostep = 1000000
+    write_profiles_flag = .false.
+    profile_interval = 1000000
+    history_interval = 1
+
+    mixing_length_alpha = 1.9657189161994031     !standard: 1.9657189161994031e+00
+    MLT_option = 'Cox'
+    which_atm_option = 'Krishna_Swamy'
+
+    use_other_D_mix = .true.
+    
+    step_overshoot_f_above_burn_h = 0.2
+    step_overshoot_f_above_burn_he = 0.0
+    step_overshoot_f_above_burn_z = 0.0
+    step_overshoot_D0_coeff = 1
+ 
+    overshoot_f0_above_burn_h = 0
+    overshoot_f0_above_burn_he = 0
+    overshoot_f0_above_burn_z = 0
+    
+    use_Type2_opacities=.true.   ! with these settings true/false should be quite indifferent if you work before RGB-tip.  
+    cubic_interpolation_in_Z = .true.
+    kap_Type2_full_off_X = 1d-6 ! Type2 is full off for X >= this
+    kap_Type2_full_on_X = 1d-10 ! Type2 can be full on for X <= this
+    kap_Type2_full_off_dZ = 1d-99 ! Type2 is full off for dZ <= this
+    kap_Type2_full_on_dZ = 1d-99 ! Type2 can be full on for dZ >= this
+
+    max_allowed_nz = 10000 
+    mesh_delta_coeff = 0.8 
+    varcontrol_target = 1d-4
+    timestep_dt_factor = 0.5 ! dt reduction factor exceed timestep limits              
+    delta_lg_XH_cntr_min = -6 ! ignore changes in lg_XH_cntr if value is less than this
+    delta_lg_XH_cntr_max = 1 ! ignore changes in lg_XH_cntr if value is more than this
+    delta_lg_XH_cntr_limit = 0.005
+    delta_lg_XH_cntr_hard_limit = -1
+    
+    ! multiply mesh_delta_coeff near convection zone boundary (czb) by the following factors
+    ! value < 1 gives increased resolution
+    ! the center mass fraction of he4 is used to control this extra coefficient
+    ! the default settings limit the application to after center he4 is depleted
+    xtra_coef_czb_full_on = 1 !1d-4 ! if center he4 < this, then use xtra coefs
+    xtra_coef_czb_full_off = 1 !0.1 ! if center he4 > this, then dont use xtra coefs
+    ! make these < 1 to increase resolution (see xtra_czb_full_on and xtra_czb_full_off)
+    ! form of names: xtra_coef_{above | below}_{lower | upper}_{nonburn | hburn | heburn | zburn}_czb
+    xtra_coef_a_l_nb_czb = 0.5 ! above lower nonburn convective boundary
+    xtra_coef_a_l_hb_czb = 0.5 ! above lower h burn convective boundary
+    xtra_coef_a_l_heb_czb =0.5 ! above lower he burn convective boundary
+    xtra_coef_a_l_zb_czb = 0.5 ! above lower z burn convective boundary
+      
+    xtra_coef_b_l_nb_czb = 0.5 ! below lower nonburn convective boundary
+    xtra_coef_b_l_hb_czb = 0.5 ! below lower h burn convective boundary
+    xtra_coef_b_l_heb_czb = 0.5 ! below lower he burn convective boundary
+    xtra_coef_b_l_zb_czb = 0.5 ! below lower z burn convective boundary
+
+    xtra_coef_a_u_nb_czb = 0.5 ! above upper nonburn convective boundary
+    xtra_coef_a_u_hb_czb = 0.5 ! above upper h burn convective boundary
+    xtra_coef_a_u_heb_czb = 0.5 ! above upper he burn convective boundary
+    xtra_coef_a_u_zb_czb = 0.5 ! above upper z burn convective boundary
+
+    xtra_coef_b_u_nb_czb = 0.5 ! below upper nonburn convective boundary
+    xtra_coef_b_u_hb_czb = 0.5 ! below upper h burn convective boundary
+    xtra_coef_b_u_heb_czb = 0.5 ! below upper he burn convective boundary
+    xtra_coef_b_u_zb_czb = 0.5 ! below upper z burn convective boundary
+    
+    ! increase resolution up to this distance away from the convective zone boundary
+    ! with distance measured in units of the pressure scale height at the boundary.
+    xtra_dist_a_l_nb_czb = 0.5 ! above lower nonburn convective boundary
+    xtra_dist_a_l_hb_czb = 0.5 ! above lower h burn convective boundary
+    xtra_dist_a_l_heb_czb = 0.5 ! above lower he burn convective boundary
+    xtra_dist_a_l_zb_czb = 0.5 ! above lower z burn convective boundary
+
+    xtra_dist_b_l_nb_czb = 0.5 ! below lower nonburn convective boundary
+    xtra_dist_b_l_hb_czb = 0.5 ! below lower h burn convective boundary
+    xtra_dist_b_l_heb_czb = 0.5 ! below lower he burn convective boundary
+    xtra_dist_b_l_zb_czb = 0.5 ! below lower z burn convective boundary
+
+    xtra_dist_a_u_nb_czb = 0.5 ! above upper nonburn convective boundary
+    xtra_dist_a_u_hb_czb = 0.5 ! above upper h burn convective boundary
+    xtra_dist_a_u_heb_czb = 0.5 ! above upper he burn convective boundary
+    xtra_dist_a_u_zb_czb = 0.5 ! above upper z burn convective boundary
+
+    xtra_dist_b_u_nb_czb = 0.5 ! below upper nonburn convective boundary
+    xtra_dist_b_u_hb_czb = 0.5 ! below upper h burn convective boundary
+    xtra_dist_b_u_heb_czb = 0.5 ! below upper he burn convective boundary
+    xtra_dist_b_u_zb_czb = 0.5 ! below upper z burn convective boundary
+
+    ! multiply mesh_delta_coeff in overshooting regions by the following factors
+    ! value < 1 gives increased resolution
+    ! the center mass fraction of he4 is used to control this extra coefficient
+    ! the default settings limit the application to after center he4 is depleted
+    xtra_coef_os_full_on = 1 ! if center he4 < this, then use xtra_coef coefs
+    xtra_coef_os_full_off = 1 ! if center he4 > this, then dont use xtra_coef coefs
+
+    xtra_coef_os_above_nonburn = 0.5
+    xtra_coef_os_below_nonburn = 0.5
+    xtra_coef_os_above_burn_h = 0.5
+    xtra_coef_os_below_burn_h = 0.5  
+    xtra_coef_os_above_burn_he = 0.5
+    xtra_coef_os_below_burn_he = 0.5
+    xtra_coef_os_above_burn_z = 0.5
+    xtra_coef_os_below_burn_z = 0.5
+    
+    ! continue to increase resolution for this distance beyond
+    ! the edge of the overshooting region, with distance measured in units
+    ! of the pressure scale height at the edge of the overshooting region.
+    ! this applies to both edges of the overshooting region.
+    xtra_dist_os_above_nonburn = 0.5
+    xtra_dist_os_below_nonburn = 0.5      
+    xtra_dist_os_above_burn_h = 0.5
+    xtra_dist_os_below_burn_h = 0.5      
+    xtra_dist_os_above_burn_he = 0.5
+    xtra_dist_os_below_burn_he = 0.5     
+    xtra_dist_os_above_burn_z = 0.5
+    xtra_dist_os_below_burn_z = 0.5
+/ ! end of controls namelist
+
+
+&pgstar
+/ ! end of pgstar namelist
