@@ -44,8 +44,8 @@ data = np.load(args.source)
 print(data.dtype.names)
 
 for i, row in enumerate(data):
-    sectors_N = np.hstack([tess_fields_vector(row['GLon'], row['GLat'])[0],
-                           tess_fields_vector(row['GLon'], -row['GLat'])[0]])
+    sectors_N = np.hstack([tess_fields_vector(row['ELon'], row['ELat'])[0],
+                           tess_fields_vector(row['ELon'], -row['ELat'])[0]])
     for j, sector in enumerate(sectors_N):
         if sector and len(I[j]) < args.Ntargets:
             I[j].append(i)
