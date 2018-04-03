@@ -34,6 +34,11 @@ example would give sector 13 (sector 0 in Southern hemisphere).
 
 ### 5. Create MESA input for each star in each sector
 
+    python3 make_MESA_input.py ../data/tri_best1000_13.npy ../results/13/{:04d}/inlist_run
+
+Loops through all the data in first argument and writes to second,
+with star number inserted.
+
 ### 6. ???
 
 ### 7. Profit
