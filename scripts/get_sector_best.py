@@ -26,11 +26,11 @@ def tess_fields_vector(lon, lat):
     return sectors
 
 parser = ArgumentParser(description=
-
 """Separates the stars in ATL file into sectors until all 26 sectors
 have `N` targets in them.  Because the ATL file is sorted in
 decreasing likelihood, these will be the `N` best targets."""
-                        )
+)
+
 parser.add_argument('source', type=str, help="filename for input data")
 parser.add_argument('output', type=str, help="base filename for output")
 parser.add_argument('-N', '--Ntargets', type=int, default=1000,
@@ -47,6 +47,7 @@ print(data.dtype.names)
 for i, row in enumerate(data):
     sectors_N = np.hstack([tess_fields_vector(row['ELon'], row['ELat'])[0],
                            tess_fields_vector(row['ELon'], -row['ELat'])[0]])
+    
     for j, sector in enumerate(sectors_N):
         if sector and len(I[j]) < args.Ntargets:
             I[j].append(i)

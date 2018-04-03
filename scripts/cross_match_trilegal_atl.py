@@ -49,7 +49,7 @@ if args.verbose:
 
 I = []  # indices of matching stars in TRILEGAL data
 
-for j, row in enumerate(atl[:10]):
+for j, row in enumerate(atl):
     allchi2 = (row['GLon']-gall)**2 + (row['GLat']-galb)**2 # + (row['Lum']-10.**tri['logL'])**2/0.01**2
     i = np.argmin(allchi2)
     I.append(i)
