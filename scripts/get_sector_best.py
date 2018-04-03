@@ -27,8 +27,9 @@ def tess_fields_vector(lon, lat):
 
 parser = ArgumentParser(description=
 
-"""blah
-"""
+"""Separates the stars in ATL file into sectors until all 26 sectors
+have `N` targets in them.  Because the ATL file is sorted in
+decreasing likelihood, these will be the `N` best targets."""
                         )
 parser.add_argument('source', type=str, help="filename for input data")
 parser.add_argument('output', type=str, help="base filename for output")
@@ -49,6 +50,8 @@ for i, row in enumerate(data):
     for j, sector in enumerate(sectors_N):
         if sector and len(I[j]) < args.Ntargets:
             I[j].append(i)
+
+    if np.all([len(i) >= args.Ntargets for i in I]): break
 
 for j, i in enumerate(I):
     np.save(args.output.format(j), data[i])
