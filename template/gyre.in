@@ -9,18 +9,22 @@
 
 &mode
 	l = 0
+	tag = 'radial'
 /
 
 &mode
 	l = 1
+	tag = 'non-radial'
 /
 
 &mode
 	l = 2
+	tag = 'non-radial'
 /
 
 &mode
 	l = 3
+	tag = 'non-radial'
 /
 
 &osc
@@ -43,6 +47,16 @@
 	n_freq = 300
 /
 
+&scan
+	grid_type = 'INVERSE'
+	freq_min = 0.15
+	freq_max = 0.50
+	freq_min_units = 'ACOUSTIC_CUTOFF'
+	freq_max_units = 'ACOUSTIC_CUTOFF'
+	n_freq = 600
+	tag_list = 'non-radial'
+/
+
 &grid
 	alpha_osc = 10
 	alpha_exp = 2
@@ -53,7 +67,7 @@
 	freq_units = 'UHZ'
 	summary_file = 'gyre_summary.txt'
 	summary_file_format = 'TXT'
-	summary_item_list = 'l,n_pg,n_p,n_g,freq,E_norm'
+	summary_item_list = 'M_star,R_star,L_star,l,n_pg,n_p,n_g,freq,E_norm'
 /
 
 &nad_output
