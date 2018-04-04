@@ -7,7 +7,6 @@ from solioak import scaling
 import AADG3
 
 parser = ArgumentParser()
-parser.add_argument('fgong', type=str, help='input FGONG file')
 parser.add_argument('summary', type=str, help='input GYRE summary')
 parser.add_argument('namein', type=str, help='name of output Fortran namelist')
 parser.add_argument('namecon', type=str, help='name of output .con file')
@@ -15,6 +14,8 @@ parser.add_argument('namerot', type=str, help='name of output .rot file')
 parser.add_argument('--splitting', type=float, default=0.0,
                     help='constant rotation splitting')
 args = parser.parse_args()
+
+header, summary = gyre.load_summary(args.summary)
 
 Lsun = 3.844e33
 Rsun = 6.96568e10
@@ -24,11 +25,9 @@ numax_sun = 3090.0
 Dnu_sun = 135.1
 sig_sun = 60.0
 
-glob, var = io.load_fgong(args.fgong)
-
-M = glob[0]/Msun  # 1.0  # Msun
-R = glob[1]/Rsun  # 1.0  # Rsun
-L = glob[2]/Lsun  # 1.0  # Lsun
+M = header['M_star']/Msun  # 1.0  # Msun
+R = header['R_star']/Rsun  # 1.0  # Rsun
+L = header['L_star']/Lsun  # 1.0  # Lsun
 Teff = (L/R**2)**0.25*Teff_sun
 numax = numax_sun*(M/R**2/(Teff/Teff_sun)**0.5)
 Dnu = Dnu_sun*np.sqrt(M/R**3)
@@ -45,8 +44,6 @@ nml['tau'] = 250.0/(numax/3090.)
 nml['sig'] = sig
 
 AADG3.save_nml(args.namein, nml)
-
-header, summary = gyre.load_summary(args.summary)
 
 l = summary['l'].astype(int)
 n = summary['n_pg'].astype(int)
