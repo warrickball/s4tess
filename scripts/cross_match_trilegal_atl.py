@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
-import matplotlib.pyplot as pl
+# import matplotlib.pyplot as pl
 from argparse import ArgumentParser
 
 parser = ArgumentParser(description=
@@ -39,8 +39,10 @@ chi2 = []
 d = 10.**(1.+np.array(tri['mu0'])/5.)
 
 gall = tri['gall']
-gall[gall > 180.] = 360. - gall[gall > 180.]
+# gall[gall > 180.] = 360. - gall[gall > 180.]
 galb = tri['galb']
+
+print('Cross matching stars...')
 
 if args.verbose:
     print(''.join(['{:>12s}']*6).format('ATL l', 'TRI l',
