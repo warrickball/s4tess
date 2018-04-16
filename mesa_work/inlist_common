@@ -32,6 +32,10 @@
     mixing_length_alpha = 1.9657189161994031     !standard: 1.9657189161994031e+00
     MLT_option = 'Cox'
     which_atm_option = 'Krishna_Swamy'
+    
+    calculate_Brunt_N2 = .true. ! only calculate Brunt_N2 if this is true
+    brunt_N2_coefficient = 1 ! standard N2 is multiplied by this value
+    num_cells_for_smooth_brunt_B = 0
 
     use_other_D_mix = .true.
     
