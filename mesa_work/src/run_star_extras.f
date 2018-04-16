@@ -27,6 +27,8 @@
       use const_def
       
       implicit none
+
+      logical :: pre_MS
       
       ! these routines are called by the standard run_star check_model
       contains
@@ -53,6 +55,9 @@
          integer, intent(out) :: ierr
          type (star_info), pointer :: s
          ierr = 0
+
+         pre_MS = .true.
+
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_startup = 0
@@ -66,6 +71,8 @@
 
       ! returns either keep_going, retry, backup, or terminate.
       integer function extras_check_model(id, id_extra)
+         use star_lib, only: star_set_age
+
          integer, intent(in) :: id, id_extra
          integer :: ierr
          type (star_info), pointer :: s
@@ -80,6 +87,12 @@
             return
          end if
 
+         if ((pre_MS) .and. (s% center_h1 < s% surface_h1 - 0.01)) then
+            ! s% star_age = 0d0
+            call star_set_age(id, 0d0, ierr)
+            if (ierr /= 0) stop 'failed to reset star age in run_star_extras.f'
+            pre_MS = .false.
+         end if
 
          ! if you want to check multiple conditions, it can be useful
          ! to set a different termination code depending on which
