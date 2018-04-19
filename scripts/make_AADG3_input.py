@@ -6,6 +6,22 @@ from argparse import ArgumentParser
 from solioak import scaling
 import AADG3
 
+def logW_meta(nu, numax, Teff, a_alpha, b_alpha, c_alpha,
+              a_Walpha, b_Walpha, c_Walpha,
+              a_DWdip, b_DWdip, c_DWdip,
+              a_nudip, b_nudip, c_nudip,
+              a_Wdip, b_Wdip, c_Wdip):
+    alpha = a_alpha + b_alpha*Teff + c_alpha*numax
+    Walpha = a_Walpha + b_Walpha*Teff + c_Walpha*numax
+    DWdip = a_DWdip + b_DWdip*Teff + c_DWdip*numax
+    nudip = a_nudip + b_nudip*Teff + c_nudip*numax
+    Wdip = a_Wdip + b_Wdip*Teff + c_Wdip*numax
+
+    output = alpha*np.log(nu/numax) + np.log(Walpha)
+    output[DWdip < 1.0] += (np.log(DWdip)/(1. + (2*np.log(nu/nudip)/np.log(Wdip))**2))[DWdip < 1.0]
+    return output
+
+
 parser = ArgumentParser()
 parser.add_argument('summary', type=str, help='input GYRE summary')
 parser.add_argument('namein', type=str, help='name of output Fortran namelist')
@@ -68,7 +84,13 @@ cenv = wenv/2./np.sqrt(2.*np.log(2.))
 
 Q = E/np.interp(nu, nu[l==0], E[l==0])
 
-width = scaling.lund_width(nu, numax)/Q
+# width = scaling.lund_width(nu, numax)/Q
+width = np.exp(logW_meta(nu, numax, Teff,
+                         1.55158260e+01, -2.37948802e-03, 6.31599047e-04,
+                         -1.45646735e+01, 3.33058266e-03, -2.10861152e-04,
+                         -1.23237508e+00, 2.82764137e-04, -3.46871178e-05,
+                         1.62600422e+02, -3.25237778e-02, 9.95638052e-01,
+                         1.89060824e+00, 2.67969076e-05, -2.49913390e-04))
 
 H = Henv*np.exp(-(nu-numax)**2/2./cenv**2)/Q
 amp2 = H*Dnu
