@@ -43,6 +43,26 @@ example would give sector 13 (sector 0 in Southern hemisphere).
 Loops through all the data in first argument and writes to second,
 with star number inserted.
 
-### 7. ???
+### 7. Run MESA
 
-### 8. Profit
+In each directory,
+
+    ./rn > log.txt
+
+### 8. Run GYRE
+
+In each directory,
+
+    $GYRE_DIR/bin/gyre_ad gyre.in
+
+### 9. Make AADG3 input files
+
+In relevant directory, e.g. `models/00/0000`
+
+    python3 ../../../scripts/make_AADG3_input.py gyre_summary.txt 00_0000.in 00_0000.con 00_0000.rot
+
+### 10. Run AADG3
+
+In relevant directory,
+
+    AADG3 <sector>_<target>.in
