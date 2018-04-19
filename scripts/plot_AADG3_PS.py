@@ -12,7 +12,12 @@ parser.add_argument('AADG3_input', type=str,
 args = parser.parse_args()
 
 nml, con, rot = AADG3.load_all_input(args.AADG3_input)
-y = np.loadtxt(nml['nameout'])
+try:
+    y = np.loadtxt(nml['nameout'])
+except OSError:
+    y = np.loadtxt('/'.join(args.AADG3_input.split('/')[:-1]) + '/' +
+                   nml['nameout'])
+    
 t = np.arange(len(y), dtype=float)*nml['cadence']
 f, p = LS(t, y).autopower(normalization='psd', nyquist_factor=1.0,
                           samples_per_peak=1)
