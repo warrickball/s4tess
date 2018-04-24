@@ -49,11 +49,24 @@ numax = numax_sun*(M/R**2/(Teff/Teff_sun)**0.5)
 Dnu = Dnu_sun*np.sqrt(M/R**3)
 sig = np.sqrt(L**2/M**3/(Teff/Teff_sun)**5.5*(numax/numax_sun))*sig_sun
 
-nml = {'user_seed': 0, 'cadence': 120.0, 'n_cadences': 19440, 'n_relax': 4320, 'n_fine': 50,
-       'sig': 60.0, 'rho': 0.45, 'tau': 250.0, 'inclination': 90.0,
-       'pcyc': 100.0, 'phi': 0.0, 'nuac': 0.0,
-       'p(1)': 1.52355, 'p(2)': 0.565349, 'p(3)': 0.0361707,
-       'ass_init': True, 'namecon': args.namecon, 'namerot': args.namerot,
+nml = {'user_seed': np.random.randint(100, 2**28-1),
+       'cadence': 120.0,
+       'n_cadences': 19440,
+       'n_relax': 4320,
+       'n_fine': 50,
+       'sig': 60.0,
+       'rho': 0.45,
+       'tau': 250.0,
+       'inclination': 90.0,
+       'pcyc': 100.0,
+       'phi': 0.0,
+       'nuac': 0.0,
+       'p(1)': 1.52355,
+       'p(2)': 0.565349,
+       'p(3)': 0.0361707,
+       'ass_init': True,
+       'namecon': args.namecon,
+       'namerot': args.namerot,
        'nameout': args.namecon.replace('.con', '.asc')}
 
 nml['tau'] = 250.0/(numax/3090.)
