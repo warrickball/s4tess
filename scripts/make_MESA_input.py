@@ -16,9 +16,9 @@ parser.add_argument('basename', type=str,
 parser.add_argument('--inlist', type=str, default='inlist_run',
                     help="filename for MESA inlist (default inlist_run)")
 parser.add_argument('--data', type=str, default='atl_data.txt',
-                    help="filename for ATL data as text")
+                    help="filename for ATL data as text (default atl_data.txt)")
 parser.add_argument('--verbose', '-v', action='store_const', const=True,
-                    default=False, help="show progress while")
+                    default=False, help="show progress")
 args = parser.parse_args()
 
 # approximate formula from Rodrigues et al. (2017)
@@ -32,7 +32,7 @@ tri = np.load(args.trilegal)
 
 for i, row in enumerate(tri):
     if args.verbose:
-        print('Creating star %i...' % i)
+        print('\rCreating star {:d} of {:d}...'.format(i+1, len(tri)), end='')
         
     t = 10.**row['logAge']/1e9
     M = row['m_ini']
@@ -59,3 +59,5 @@ for i, row in enumerate(tri):
         for key in row.dtype.names:
             # print('{:s} = {:.16g}\n'.format(key, row[key]))
             f.write('{:>16s} = {:.16g}\n'.format(key, row[key]))
+
+print()
