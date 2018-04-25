@@ -9,7 +9,7 @@ al. (2017) for an I-band magnitude in the given file.""")
 parser.add_argument('lc_in', type=str,
                     help='filename of input lightcurve')
 parser.add_argument('Imag', type=str,
-                    help="I-band magnitude or text file with a line"
+                    help="I-band magnitude or text file with a line "
                     "containing 'imag = ...'")
 parser.add_argument('lc_out', type=str,
                     help='filename of output lightcurve')
@@ -24,8 +24,8 @@ except ValueError:
             if line[0].lower().startswith('imag'):
                 Imag = float(line[1])
                 break
-            else:
-                raise IOError("no line imag = ... in file %s" % args.Imag)
+        else:
+            raise IOError("no line imag = ... in file %s" % args.Imag)
         
 
 # see Stassun et al. (2017)
