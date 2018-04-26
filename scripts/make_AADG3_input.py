@@ -54,10 +54,10 @@ nml = {'user_seed': np.random.randint(100, 2**28-1),
        'n_cadences': 19440,
        'n_relax': 4320,
        'n_fine': 50,
-       'sig': 60.0,
+       'sig': sig,
        'rho': 0.45,
-       'tau': 250.0,
-       'inclination': 90.0,
+       'tau': 250.0/(numax/3090.),
+       'inclination': np.degrees(np.arccos(np.random.rand()))
        'pcyc': 100.0,
        'phi': 0.0,
        'nuac': 0.0,
@@ -68,9 +68,6 @@ nml = {'user_seed': np.random.randint(100, 2**28-1),
        'namecon': args.namecon,
        'namerot': args.namerot,
        'nameout': args.namecon.replace('.con', '.asc')}
-
-nml['tau'] = 250.0/(numax/3090.)
-nml['sig'] = sig
 
 AADG3.save_nml(args.namein, nml)
 
