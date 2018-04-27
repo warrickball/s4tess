@@ -3,7 +3,7 @@
 import numpy as np
 from tomso import gyre, io
 from argparse import ArgumentParser
-from solioak import scaling
+# from solioak import scaling
 import AADG3
 
 def logW_meta(nu, numax, Teff, a_alpha, b_alpha, c_alpha,
@@ -57,7 +57,7 @@ nml = {'user_seed': np.random.randint(100, 2**28-1),
        'sig': sig,
        'rho': 0.45,
        'tau': 250.0/(numax/3090.),
-       'inclination': np.degrees(np.arccos(np.random.rand()))
+       'inclination': np.degrees(np.arccos(np.random.rand())),
        'pcyc': 100.0,
        'phi': 0.0,
        'nuac': 0.0,
@@ -95,12 +95,12 @@ cenv = wenv/2./np.sqrt(2.*np.log(2.))
 Q = E/np.interp(nu, nu[l==0], E[l==0])
 
 # width = scaling.lund_width(nu, numax)/Q
-width = np.exp(logW_meta(nu, numax, Teff,
-                         1.55158260e+01, -2.37948802e-03, 6.31599047e-04,
-                         -1.45646735e+01, 3.33058266e-03, -2.10861152e-04,
-                         -1.23237508e+00, 2.82764137e-04, -3.46871178e-05,
-                         1.62600422e+02, -3.25237778e-02, 9.95638052e-01,
-                         1.89060824e+00, 2.67969076e-05, -2.49913390e-04))
+# using 25 of Guy's red giants
+p25 = [-3.71033159e+00, 1.07268220e-03, 1.88285544e-04, -7.20902433e+01,
+       1.54336225e-02, 9.10050555e-04, -2.26620472e-01, 5.08279583e-05,
+       2.71537654e-06, -2.18970560e+03, 4.30163078e-01, 8.42663954e-01,
+       -5.63927133e-01, 1.13801669e-04, 1.31215914e-04]
+width = np.exp(logW_meta(nu, numax, Teff, *p25))
 
 H = Henv*np.exp(-(nu-numax)**2/2./cenv**2)/Q
 amp2 = H*Dnu
