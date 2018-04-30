@@ -106,7 +106,7 @@ H = Henv*np.exp(-(nu-numax)**2/2./cenv**2)/Q
 amp2 = H*Dnu
 
 np.savetxt(args.namecon, np.vstack([l, n, nu, width, amp2, 0.0*nu]).T,
-           fmt=['%8i','  %7i','  %12.3e','  %12.7e','  %12.7e','  %12.8e'])
+           fmt=['%8i','  %7i','  %12.7e','  %12.7e','  %12.7e','  %12.8e'])
 
 with open(args.namerot, 'w') as f:
     for ni, li in zip(n, l):
