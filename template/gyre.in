@@ -3,8 +3,8 @@
 
 &model
 	model_type = 'EVOL'
-	file = 'final.profile.FGONG'
-	file_format = 'FGONG'
+	file = 'final.profile.GYRE.rot'
+	file_format = 'MESA'
 /
 
 &mode
@@ -67,7 +67,7 @@
 	freq_units = 'UHZ'
 	summary_file = 'gyre_summary.txt'
 	summary_file_format = 'TXT'
-	summary_item_list = 'M_star,R_star,L_star,l,n_pg,n_p,n_g,freq,E_norm'
+	summary_item_list = 'M_star,R_star,L_star,l,n_pg,n_p,n_g,freq,E_norm,dfreq_rot'
 /
 
 &nad_output

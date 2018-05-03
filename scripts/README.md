@@ -49,19 +49,23 @@ In each directory,
 
     ./rn > log.txt
 
-### 8. Run GYRE
+### 8. Add rotation
+
+    python3 ../../../scripts/add_rotation.py final.profile.GYRE LOGS/history.data
+
+### 9. Run GYRE
 
 In each directory,
 
     $GYRE_DIR/bin/gyre_ad gyre.in
 
-### 9. Make AADG3 input files
+### 10. Make AADG3 input files
 
 In relevant directory, e.g. `models/00/0000`
 
     python3 ../../../scripts/make_AADG3_input.py gyre_summary.txt 00_0000.in 00_0000.con 00_0000.rot
 
-### 10. Run AADG3
+### 11. Run AADG3
 
 In relevant directory,
 
