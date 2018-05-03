@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
-from tomso import gyre, io
+from tomso import gyre
 from argparse import ArgumentParser
 # from solioak import scaling
 import AADG3
@@ -106,10 +106,10 @@ H = Henv*np.exp(-(nu-numax)**2/2./cenv**2)/Q
 amp2 = H*Dnu
 
 np.savetxt(args.namecon, np.vstack([l, n, nu, width, amp2, 0.0*nu]).T,
-           fmt=['%8i','  %7i','  %12.7e','  %12.7e','  %12.7e','  %12.8e'])
+           fmt=['%2i','  %5i','  %12.7e','  %12.7e','  %12.7e','  %12.8e'])
 
 with open(args.namerot, 'w') as f:
     for ni, li in zip(n, l):
         for m in range(1, li+1):
-            f.write('%8i%8i%8i%9.3f\n' % (ni, li, m, args.splitting))
+            f.write('%5i%3i%3i%9.3f\n' % (ni, li, m, args.splitting))
     
