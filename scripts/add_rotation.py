@@ -34,18 +34,32 @@ parser.add_argument('history', type=str,
 parser.add_argument('-o', '--output', type=str, default=None,
                  help="Filename for output GYRE model "
                  "(default=append .rot to source model filename)")
+parser.add_argument('--no-core-noise', action='store_const',
+                    const=True, default=False,
+                    help="don't randomly sample uncertainty in core rotation rate")
+parser.add_argument('--no-env-noise', action='store_const',
+                    const=True, default=False,
+                    help="don't randomly sample uncertainty in envelope rotation rate")
 args = parser.parse_args()
 
 gyre_header, profile = gyre.load_gyre(args.model)
 mesa_header, history = mesa.load_history(args.history)
 
-P = P_mamabrand(10.**history['log_Teff'][-1], history['star_age'][-1]/1e3)*86400.0
-profile['omega'] = 2.*np.pi/P
+P = P_mamabrand(10.**history['log_Teff'][-1], history['star_age'][-1]/1e3,
+                noisy=not args.no_env_noise)*86400.0
+Omega_env = 2.*np.pi/P
+profile['omega'] = Omega_env
 
 if history['center_h1'][-1] < 1e-4 and np.log10(history['gravity'][-1]) < 3.8:
     # fit to Mosser et al. (2012) data for RGB stars, Dnu > 12 uHz
-    Omega_core = 0.375 + 0.1045*np.random.randn()
-    Omega_core = Omega_core*1e-6*2.*np.pi
+    if args.no_core_noise:
+        Omega_core = 0.375
+    else:
+        Omega_core = 0.375 + 0.1045*np.random.randn()
+        
+    Omega_core = Omega_core*1e-6*2.*np.pi  # nHz -> radians/s
+    Omega_core = max(Omega_core, Omega_env)  # force Omega_core > Omega_env
+    
     # find the core/envelope boundary
     k_core = [row['k'] for row in profile
               if row['r']/gyre_header['R'] < 0.98 and row['N2'] > 0][-1]

@@ -27,8 +27,10 @@ parser.add_argument('summary', type=str, help='input GYRE summary')
 parser.add_argument('namein', type=str, help='name of output Fortran namelist')
 parser.add_argument('namecon', type=str, help='name of output .con file')
 parser.add_argument('namerot', type=str, help='name of output .rot file')
-parser.add_argument('--splitting', type=float, default=0.0,
-                    help='constant rotation splitting')
+parser.add_argument('--splitting', type=float, default=-1,
+                    help="constant rotation splitting, ignored if < 0, "
+                    "in which case rotation is taken from summary "
+                    "if available, otherwise rotation = 0 (default -1)")
 args = parser.parse_args()
 
 header, summary = gyre.load_summary(args.summary)
@@ -108,8 +110,17 @@ amp2 = H*Dnu
 np.savetxt(args.namecon, np.vstack([l, n, nu, width, amp2, 0.0*nu]).T,
            fmt=['%2i','  %5i','  %12.7e','  %12.7e','  %12.7e','  %12.8e'])
 
+if args.splitting >= 0:
+    dnu_rot = args.splitting*np.ones_like(nu)
+else:
+    try:
+        dnu_rot = summary['dfreq_rot']
+    except ValueError:
+        dnu_rot = np.zeros_like(nu)
+        
+
 with open(args.namerot, 'w') as f:
-    for ni, li in zip(n, l):
+    for ni, li, dnu_roti in zip(n, l, dnu_rot):
         for m in range(1, li+1):
-            f.write('%5i%3i%3i%9.3f\n' % (ni, li, m, args.splitting))
-    
+            f.write('%5i%3i%3i%12.7f\n' % (ni, li, m, dnu_roti))
+
