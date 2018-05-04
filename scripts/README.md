@@ -38,7 +38,7 @@ example would give sector 13 (sector 0 in Southern hemisphere).
 
 ### 6. Create MESA input for each star in each sector
 
-    python3 make_MESA_input.py ../data/tri_best1000_13.npy ../results/13/{:04d}/inlist_run --tri-data tri_data.txt
+    python3 make_MESA_input.py ../data/tri_best1000_13.npy ../results/13/{:04d} --tri-data tri_data.txt
 
 Loops through all the data in first argument and writes to second,
 with star number inserted.
@@ -57,7 +57,7 @@ In each directory,
 
 In each directory,
 
-    $GYRE_DIR/bin/gyre_ad gyre.in
+    $GYRE_DIR/bin/gyre gyre.in
 
 ### 10. Make AADG3 input files
 
@@ -71,11 +71,12 @@ In relevant directory,
 
     AADG3 13_0000.in
 
-### 12. Add white noise to AAD3 output
+### 12. Add white noise to AADG3 output
 
 First, we need all the input for Mat's noise calculation.
 
     python3 scripts/extract_catalogue_data.py data/atl_best1000_13.npy models/13/{:04d}/atl_data.txt
+    python3 scripts/extract_catalogue_data.py data/tri_best1000_13.npy models/13/{:04d}/tri_data.txt
 
 Now add white noise.  In each directory,
 

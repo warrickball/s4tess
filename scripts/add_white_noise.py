@@ -100,4 +100,4 @@ elif args.model == 'schofield':
         
 asc = np.loadtxt(args.lc_in)
 asc = asc + np.random.randn(len(asc))*sigma
-np.savetxt(args.lc_out, asc)
+np.savetxt(args.lc_out, asc, fmt='%16.7f')

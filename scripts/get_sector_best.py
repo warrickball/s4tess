@@ -35,16 +35,23 @@ parser.add_argument('source', type=str, help="filename for input data")
 parser.add_argument('output', type=str, help="base filename for output")
 parser.add_argument('-N', '--Ntargets', type=int, default=1000,
                     help="number of targets per sector (default=1000)")
+parser.add_argument('-v', '--verbose', action='store_const',
+                    const=True, default=False)
 args = parser.parse_args()
 
 Nsectors = 26  # 13 North, 13 South
 
 I = [[] for i in range(Nsectors)]
 
+if args.verbose:
+    print('Loading data from %s...' % args.source)
 data = np.load(args.source)
-print(data.dtype.names)
 
+if args.verbose:
+    print('Selecting best stars in each sector...')
+    
 for i, row in enumerate(data):
+    
     sectors_N = np.hstack([tess_fields_vector(row['ELon'], row['ELat'])[0],
                            tess_fields_vector(row['ELon'], -row['ELat'])[0]])
     
@@ -54,8 +61,11 @@ for i, row in enumerate(data):
 
     if np.all([len(i) >= args.Ntargets for i in I]): break
 
+if args.verbose:
+    print('Saving output...')
+        
 for j, i in enumerate(I):
     np.save(args.output.format(j), data[i])
 
-# results_file = 'test_results.csv'   # '/home/wball/mnt/adfbison/data/trilegal_results.csv'
-# results = np.genfromtxt(results_file, names=True, delimiter=',')
+if args.verbose:
+    print('Done.')

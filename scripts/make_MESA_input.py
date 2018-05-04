@@ -55,8 +55,8 @@ for i, row in enumerate(tri):
                       '&pgstar\n',
                       '/\n'])
 
-    if args.data:
-        with open(args.basename.format(i) + '/' + args.data, 'w') as f:
+    if args.tri_data:
+        with open(args.basename.format(i) + '/' + args.tri_data, 'w') as f:
             for key in row.dtype.names:
                 # print('{:s} = {:.16g}\n'.format(key, row[key]))
                 f.write('{:>16s} = {:.16g}\n'.format(key, row[key]))
