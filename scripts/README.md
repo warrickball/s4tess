@@ -22,11 +22,11 @@ input for ATL.
 
 ### 4. Get best targets in each sector from ATL output
 
-    python3 get_sector_best.py ../data/atl.npy ../data/atl_best1000_{:2d}.npy -N 1000
+    python3 get_sector_best.py ../data/atl.npy ../data/atl_best1000_{:02d}.npy -N 1000
 
 Goes down the likelihood-sorted ATL file `atl.npy` recording in which
 sector each star occurs, then writes the best targets found in this
-way to files with names patching `atl_best1000_{:2d}.npy`.
+way to files with names patching `atl_best1000_{:02d}.npy`.
 
 ### 5. Find details of best targets in TRILEGAL data
 
@@ -38,7 +38,7 @@ example would give sector 13 (sector 0 in Southern hemisphere).
 
 ### 6. Create MESA input for each star in each sector
 
-    python3 make_MESA_input.py ../data/tri_best1000_13.npy ../results/13/{:04d}/inlist_run
+    python3 make_MESA_input.py ../data/tri_best1000_13.npy ../results/13/{:04d}/inlist_run --tri-data tri_data.txt
 
 Loops through all the data in first argument and writes to second,
 with star number inserted.
@@ -61,12 +61,22 @@ In each directory,
 
 ### 10. Make AADG3 input files
 
-In relevant directory, e.g. `models/00/0000`
+In relevant directory, e.g. `models/13/0000`
 
-    python3 ../../../scripts/make_AADG3_input.py gyre_summary.txt 00_0000.in 00_0000.con 00_0000.rot
+    python3 ../../../scripts/make_AADG3_input.py gyre_summary.txt 13_0000.in 13_0000.con 13_0000.rot
 
 ### 11. Run AADG3
 
 In relevant directory,
 
-    AADG3 <sector>_<target>.in
+    AADG3 13_0000.in
+
+### 12. Add white noise to AAD3 output
+
+First, we need all the input for Mat's noise calculation.
+
+    python3 scripts/extract_catalogue_data.py data/atl_best1000_13.npy models/13/{:04d}/atl_data.txt
+
+Now add white noise.  In each directory,
+
+    python3 ../../../scripts/add_white_noise.py atl_data.txt tri_data.txt 13_0000.asc 13_0000_WN.asc

@@ -21,11 +21,11 @@ cat = np.load(args.cat)
 
 for i, row in enumerate(cat):
     if args.verbose:
-        print('\rCreating star {:d} of {:d}...'.format(i+1, len(cat)), end='')
+        print('\rExtracting star {:d} of {:d}...'.format(i+1, len(cat)), end='')
     
     with open(args.output.format(i), 'w') as f:
         for key in row.dtype.names:
             f.write('{:>16s} = {:.16g}\n'.format(key, row[key]))
 
 if args.verbose:
-    print('\nFinished')
+    print('\nDone.')
