@@ -45,7 +45,7 @@ args = parser.parse_args()
 gyre_header, profile = gyre.load_gyre(args.model)
 mesa_header, history = mesa.load_history(args.history)
 
-P = P_mamabrand(10.**history['log_Teff'][-1], history['star_age'][-1]/1e3,
+P = P_mamabrand(10.**history['log_Teff'][-1], history['star_age'][-1]/1e6,
                 noisy=not args.no_env_noise)*86400.0
 Omega_env = 2.*np.pi/P
 profile['omega'] = Omega_env
