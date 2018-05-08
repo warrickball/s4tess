@@ -15,6 +15,11 @@ def BV_to_Teff(BV):
 def Teff_to_BV(Teff):
     return fsolve(lambda z: BV_to_Teff(z)-Teff, np.zeros_like(Teff))
 
+def f_gyro(BV, t, a, b, c, n):
+    # standard gyro relation
+    # age in Myr
+    return a*(BV-c)**b*t**n
+
 def P_mamabrand(Teff, t, noisy=False):
     # Mamajek & Hillebrand (2008), eq. (12)--(14), period in days
     # http://adsabs.harvard.edu/abs/2008ApJ...687.1264M
@@ -23,7 +28,37 @@ def P_mamabrand(Teff, t, noisy=False):
     b = 0.325 + 0.024*noisy*np.random.randn()
     c = 0.495 + 0.010*noisy*np.random.randn()
     n = 0.566 + 0.008*noisy*np.random.randn()
-    return a*(Teff_to_BV(Teff)-c)**b*t**n
+    return f_gyro(Teff_to_BV(Teff), t, a, b, c, n)
+
+
+def P_angus(Teff, logg, t, noisy=False):
+    # Angus et al. (2015)
+    # http://adsabs.harvard.edu/abs/2015MNRAS.450.1787A
+    # uncertainties are just averages of asymmetric errors
+
+    # if you want to skip subgiant relation, just give a large value
+    # for logg
+
+    if logg < 4.2:                 # subgiant, eq. (8)
+        Z = 16.1 + 0.75*noisy*np.random.randn()  # mean
+        W = 9.9 + 0.6*noisy*np.random.randn()  # std
+
+        P = Z + W*np.random.randn()
+    elif Teff > BV_to_Teff(0.45):  # hot dwarf, eq. (7)
+        Y = 5.0 + 0.9*np.random.randn()  # mean
+        V = 2.1 + 0.8*np.random.randn()  # std
+
+        P = Y + V*np.random.randn()
+    else:                          # cool dwarf, eq. (6)
+        a = 0.40 + 0.175*noisy*np.random.randn()
+        b = 0.31 + 0.155*noisy*np.random.randn()
+        c = 0.45
+        n = 0.55 + 0.055*noisy*np.random.randn()
+
+        P = f_gyro(Teff_to_BV(Teff), t, a, b, c, n)
+
+    return np.maximum(P, 1.0)  # set a minimum period of 1d (~= 11.6 uHz!)
+
 
 parser = ArgumentParser(description="""
 Add rotation to the specified model.""")
@@ -45,8 +80,10 @@ args = parser.parse_args()
 gyre_header, profile = gyre.load_gyre(args.model)
 mesa_header, history = mesa.load_history(args.history)
 
-P = P_mamabrand(10.**history['log_Teff'][-1], history['star_age'][-1]/1e6,
-                noisy=not args.no_env_noise)*86400.0
+# P = P_mamabrand(10.**history['log_Teff'][-1], history['star_age'][-1]/1e6,
+#                 noisy=not args.no_env_noise)*86400.0
+P = P_angus(10.**history['log_Teff'][-1], 10.0, history['star_age'][-1]/1e6,
+            noisy=not args.no_env_noise)*86400.0
 Omega_env = 2.*np.pi/P
 profile['omega'] = Omega_env
 
