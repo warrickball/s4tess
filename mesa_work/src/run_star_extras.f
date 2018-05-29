@@ -29,6 +29,8 @@
       implicit none
 
       logical :: pre_MS
+      logical :: zero_age_on_next_step
+      real(dp) :: chi2_prev
       
       ! these routines are called by the standard run_star check_model
       contains
@@ -57,6 +59,8 @@
          ierr = 0
 
          pre_MS = .true.
+         zero_age_on_next_step = .false.
+         chi2_prev = 1d99
 
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
@@ -76,23 +80,45 @@
          integer, intent(in) :: id, id_extra
          integer :: ierr
          type (star_info), pointer :: s
+
+         real(dp) :: chi2
+
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
          extras_check_model = keep_going         
-         if (.false. .and. s% star_mass_h1 < 0.35d0) then
-            ! stop when star hydrogen mass drops to specified level
-            extras_check_model = terminate
-            write(*, *) 'have reached desired hydrogen mass'
-            return
-         end if
 
-         if ((pre_MS) .and. (s% center_h1 < s% surface_h1 - 0.01)) then
-            ! s% star_age = 0d0
+         ! if ((pre_MS) .and. (s% center_h1 < s% surface_h1 - 0.01d0)) then
+         !    call star_set_age(id, 0d0, ierr)
+         !    if (ierr /= 0) stop 'failed to reset star age in run_star_extras.f'
+         !    pre_MS = .false.
+         ! end if
+
+         ! if (zero_age_on_next_step) then
+         !    call star_set_age(id, 0d0, ierr)
+         !    if (ierr /= 0) stop 'failed to reset star age in run_star_extras.f'
+         !    zero_age_on_next_step = .false.
+         ! end if
+
+         if (pre_MS) then
             call star_set_age(id, 0d0, ierr)
             if (ierr /= 0) stop 'failed to reset star age in run_star_extras.f'
-            pre_MS = .false.
+            if (s% center_h1 < s% surface_h1 - 0.01d0) then
+               write(*,*) 'reached ZAMS'
+               zero_age_on_next_step = .true.
+               pre_ms = .false.
+            end if
          end if
+
+         chi2 = chi2_prev
+         if (s% star_age > 0.98d0*s% max_age/1.1d0) then
+            chi2 = (s% Teff - s% x_ctrl(1))**2/100d0**2 &
+                 + (s% photosphere_L - s% x_ctrl(2))**2
+            write(*,*) 'chi2, chi2_prev', chi2, chi2_prev
+            if (chi2 > chi2_prev) extras_check_model = terminate
+         end if
+
+         chi2_prev = chi2
 
          ! if you want to check multiple conditions, it can be useful
          ! to set a different termination code depending on which
