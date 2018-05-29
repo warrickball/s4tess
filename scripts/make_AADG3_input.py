@@ -4,6 +4,7 @@ import numpy as np
 from tomso import gyre
 from argparse import ArgumentParser
 # from solioak import scaling
+from collections import OrderedDict
 import AADG3
 
 def logW_meta(nu, numax, Teff, a_alpha, b_alpha, c_alpha,
@@ -51,27 +52,28 @@ numax = numax_sun*(M/R**2/(Teff/Teff_sun)**0.5)
 Dnu = Dnu_sun*np.sqrt(M/R**3)
 sig = np.sqrt(L**2/M**3/(Teff/Teff_sun)**5.5*(numax/numax_sun))*sig_sun
 
-nml = {'user_seed': np.random.randint(100, 2**28-1),
-       'cadence': 120.0,
-       'n_cadences': 19440,
-       'n_relax': 4320,
-       'n_fine': 50,
-       'sig': sig,
-       'rho': 0.45,
-       'tau': 250.0/(numax/3090.),
-       'inclination': np.degrees(np.arccos(np.random.rand())),
-       'pcyc': 100.0,
-       'phi': 0.0,
-       'nuac': 0.0,
-       'p(1)': 1.52355,
-       'p(2)': 0.565349,
-       'p(3)': 0.0361707,
-       'ass_init': True,
-       'namecon': args.namecon,
-       'namerot': args.namerot,
-       'nameout': args.namecon.replace('.con', '.asc')}
+namelist = OrderedDict()
+namelist['user_seed'] = np.random.randint(100, 2**28-1)
+namelist['cadence'] = 120.0
+namelist['n_cadences'] = 19440
+namelist['n_relax'] = 4320
+namelist['n_fine'] = 50
+namelist['sig'] = sig
+namelist['rho'] = 0.45
+namelist['tau'] = 250.0/(numax/3090.)
+namelist['inclination'] = np.degrees(np.arccos(np.random.rand()))
+namelist['pcyc'] = 100.0
+namelist['phi'] = 0.0
+namelist['nuac'] = 0.0
+namelist['p(1)'] = 1.52355
+namelist['p(2)'] = 0.565349
+namelist['p(3)'] = 0.0361707
+namelist['ass_init'] = True
+namelist['namecon'] = args.namecon
+namelist['namerot'] = args.namerot
+namelist['nameout'] = args.namecon.replace('.con', '.asc')
 
-AADG3.save_nml(args.namein, nml)
+AADG3.save_namelist(args.namein, namelist)
 
 l = summary['l'].astype(int)
 n = summary['n_pg'].astype(int)
