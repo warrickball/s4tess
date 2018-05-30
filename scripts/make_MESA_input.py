@@ -56,7 +56,7 @@ for i, row in enumerate(tri):
     # Y = 1.0 - X - Z
     with open(args.basename.format(i) + '/' + args.inlist, 'w') as f:
         f.writelines(['&star_job\n',
-                      '    pre_ms_T_c = {:.16g}d5\n'.format(Tc5_interpolator(M, Z)),
+                      '    pre_ms_T_c = {:.16g}d5\n'.format(Tc5_interpolator(M, Z)[()]),
                       '/\n\n',
                       '&controls\n',
                       '    max_age = {:.16g}d9\n'.format(t*1.10),

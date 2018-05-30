@@ -57,7 +57,7 @@ do
     python3 scripts/cross_match_trilegal_atl.py data/tri.npy data/atl_test_$sector.npy -o data/tri_test_$sector.npy -v
     mkdir -p test_run/$sector
     seq -w 0000 $(echo $NSTARS-1 | bc) | xargs -t -I{} cp -R template test_run/$sector/{}
-    python3 scripts/make_MESA_input.py data/tri_test_$sector.npy test_run/$sector/{:04d} -v
+    python3 scripts/make_MESA_input.py data/tri_test_$sector.npy test_run/$sector/{:04d} -v --Tc data/Tc.dat
     python3 scripts/extract_catalogue_data.py data/atl_test_$sector.npy test_run/$sector/{:04d}/atl_data.txt
     python3 scripts/extract_catalogue_data.py data/tri_test_$sector.npy test_run/$sector/{:04d}/tri_data.txt
     seq -w 0000 $(echo $NSTARS-1 | bc) | xargs -t -P$RUNS -I{} bash -c "do_one $sector {}"
