@@ -85,7 +85,7 @@ mesa_header, history = mesa.load_history(args.history)
 P = P_angus(10.**history['log_Teff'][-1], 10.0, history['star_age'][-1]/1e6,
             noisy=not args.no_env_noise)*86400.0
 Omega_env = 2.*np.pi/P
-profile['omega'] = Omega_env
+profile['Omega'] = Omega_env
 
 if history['center_h1'][-1] < 1e-4 and np.log10(history['gravity'][-1]) < 3.8:
     # fit to Mosser et al. (2012) data for RGB stars, Dnu > 12 uHz
@@ -100,7 +100,7 @@ if history['center_h1'][-1] < 1e-4 and np.log10(history['gravity'][-1]) < 3.8:
     # find the core/envelope boundary
     k_core = [row['k'] for row in profile
               if row['r']/gyre_header['R'] < 0.98 and row['N2'] > 0][-1]
-    profile['omega'][:k_core] = Omega_core
+    profile['Omega'][:k_core] = Omega_core
 
 if args.output is None:
     output = args.model + '.rot'
