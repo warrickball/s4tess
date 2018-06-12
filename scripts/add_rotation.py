@@ -6,7 +6,7 @@ from tomso import gyre, mesa
 from argparse import ArgumentParser
 
 def BV_to_Teff(BV):
-    # coefficients as in Table 2, which is revers of polyval input
+    # coefficients as in Table 2, which is reverse of polyval input
     p = [3.979145106714099, -0.654992268598245, 1.740690042385095,
          -4.608815154057166, 6.792599779944473, -5.396909891322525,
          2.192970376522490, -0.359495739295671]
@@ -23,7 +23,6 @@ def f_gyro(BV, t, a, b, c, n):
 def P_mamabrand(Teff, t, noisy=False):
     # Mamajek & Hillebrand (2008), eq. (12)--(14), period in days
     # http://adsabs.harvard.edu/abs/2008ApJ...687.1264M
-    k = 1.0 if noisy else 0.0
     a = 0.407 + 0.021*noisy*np.random.randn()
     b = 0.325 + 0.024*noisy*np.random.randn()
     c = 0.495 + 0.010*noisy*np.random.randn()
@@ -92,9 +91,9 @@ if history['center_h1'][-1] < 1e-4 and np.log10(history['gravity'][-1]) < 3.8:
     if args.no_core_noise:
         Omega_core = 0.375
     else:
-        Omega_core = 0.375 + 0.1045*np.random.randn()
+        Omega_core = 0.375 + 0.105*np.random.randn()
         
-    Omega_core = Omega_core*1e-6*2.*np.pi  # nHz -> radians/s
+    Omega_core = Omega_core*1e-6*2.*np.pi  # uHz -> radians/s
     Omega_core = max(Omega_core, Omega_env)  # force Omega_core > Omega_env
     
     # find the core/envelope boundary

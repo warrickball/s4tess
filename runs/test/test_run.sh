@@ -27,7 +27,7 @@ function do_one() {
 	echo TRY $TRIES > mesa.log
 	./rn >> mesa.log
     done
-    python3 $ONE_TOP_DIR/scripts/add_rotation.py final.profile.GYRE LOGS/history.data
+    python3 $ONE_TOP_DIR/scripts/add_rotation.py final.profile.GYRE LOGS/history.data --no-env-noise
     $GYRE_DIR/bin/gyre gyre.in > gyre.log
     python3 $ONE_TOP_DIR/scripts/make_AADG3_input.py gyre_summary.txt $1_$2.in $1_$2.con $1_$2.rot
     AADG3 $1_$2.in

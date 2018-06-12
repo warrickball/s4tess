@@ -113,9 +113,9 @@
          chi2 = chi2_prev
          if (s% star_age > 0.98d0*s% max_age/1.1d0) then
             chi2 = (s% Teff - s% x_ctrl(1))**2/100d0**2 &
-                 + (s% photosphere_L - s% x_ctrl(2))**2
+                 + (s% photosphere_L - s% x_ctrl(2))**2/0.1d0**2
             write(*,*) 'chi2, chi2_prev', chi2, chi2_prev
-            if (chi2 > chi2_prev) extras_check_model = terminate
+            if ((chi2 > chi2_prev) .and. (chi2_prev < 1d0)) extras_check_model = terminate
          end if
 
          chi2_prev = chi2

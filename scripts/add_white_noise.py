@@ -21,7 +21,7 @@ args = parser.parse_args()
 
 def stassun(Imag):
     # see Stassun et al. (2017)
-    # https://arxiv.org/abs/1706.00495
+    # https://arxiv.org/abs/1706.00495v3
 
     # if Imag is less than local minimum aroung 5,
     # use flat line that roughly corresponds to systematic noise
@@ -75,7 +75,7 @@ def schofield(Imag, Teff, ELon=0.0, ELat=30.0, GLon=96.0, GLat=-30.0,
     noise_sys  = 0.0*noise_star + sys_limit/1e6/np.sqrt(cadence/3600.0)
 
     noise = np.sqrt(noise_star**2 + noise_sky**2 + noise_ro**2 + noise_sys**2)
-    return noise*1e6  # parts -> ppm
+    return noise*1e6*np.sqrt(cadence/3600.0)  # parts x sqrt(hr) -> ppm * sqrt(cadence)
 
 
 tri = {}  # TRILEGAL data
