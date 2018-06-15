@@ -76,6 +76,7 @@
       ! returns either keep_going, retry, backup, or terminate.
       integer function extras_check_model(id, id_extra)
          use star_lib, only: star_set_age
+         use crlibm_lib, only: log10_cr
 
          integer, intent(in) :: id, id_extra
          integer :: ierr
@@ -111,9 +112,10 @@
          end if
 
          chi2 = chi2_prev
-         if (s% star_age > 0.98d0*s% max_age/1.1d0) then
-            chi2 = (s% Teff - s% x_ctrl(1))**2/100d0**2 &
-                 + (s% photosphere_L - s% x_ctrl(2))**2/0.1d0**2
+         if (s% star_age > 0.97d0*s% max_age/1.1d0 .or. &
+             s% star_age > 0.97d0*(s% max_age - 0.2d9)) then
+            chi2 = (s% Teff - s% x_ctrl(1))**2/200d0**2 &
+                 + (log10_cr(s% photosphere_L) - s% x_ctrl(2))**2/0.04d0**2
             write(*,*) 'chi2, chi2_prev', chi2, chi2_prev
             if ((chi2 > chi2_prev) .and. (chi2_prev < 1d0)) extras_check_model = terminate
          end if

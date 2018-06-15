@@ -23,6 +23,8 @@ parser.add_argument('--verbose', '-v', action='store_const', const=True,
 parser.add_argument('--Tc', type=str,
                     default='/home/ADF/ballwh/work/s4tess/data/Tc.dat',
                     help="filename of central temperature data")
+parser.add_argument('-N', type=int, default=-1,
+                    help="number of stars for which to create input (default=all of them)")
 args = parser.parse_args()
 
 # get central temperature data
@@ -38,15 +40,18 @@ Yp = 0.2485
 dY_dZ = 1.0068337129840546697 # 1.007
 
 tri = np.load(args.trilegal)
+if args.N > 0:
+    tri = tri[:args.N]
 
 for i, row in enumerate(tri):
     if args.verbose:
         print('\rCreating star {:d} of {:d}...'.format(i+1, len(tri)), end='')
 
     Teff = 10.**row['logTe']
-    photosphere_L = 10.**row['logL']
+    log_L = row['logL']
         
     t = 10.**row['logAge']/1e9
+    t = np.maximum(1.1*t, t + 0.2)
     M = row['m_ini']
     Z = 10.**row['M_H']*Zsun  # as described in paper
     Y = Yp + dY_dZ*Z
@@ -54,19 +59,22 @@ for i, row in enumerate(tri):
     # X = (1.0 - Yp)/(1.0 + (1.0 + dY_dZ)*Z_X)
     # Z = Z_X*X
     # Y = 1.0 - X - Z
+
+    Tc5 = Tc5_interpolator(M,Z)[()]
+
     with open(args.basename.format(i) + '/' + args.inlist, 'w') as f:
         f.writelines(['&star_job\n',
-                      '    pre_ms_T_c = {:.16g}d5\n'.format(Tc5_interpolator(M, Z)[()]),
+                      '    pre_ms_T_c = {:.16g}d5\n'.format(Tc5),
                       '/\n\n',
                       '&controls\n',
-                      '    max_age = {:.16g}d9\n'.format(t*1.10),
+                      '    max_age = {:.16g}d9\n'.format(t),
                       '    initial_mass = {:.16g}d0\n'.format(M),
                       '    initial_Y = {:.16g}d0\n'.format(Y),
                       '    initial_Z = {:.16g}d0\n'.format(Z),
                       '    Zbase = {:.16g}d0\n'.format(Z),
                       '\n',
                       '    x_ctrl(1) = {:.16g}d0\n'.format(Teff),
-                      '    x_ctrl(2) = {:.16g}d0\n'.format(photosphere_L),
+                      '    x_ctrl(2) = {:.16g}d0\n'.format(log_L),
                       '/\n\n',
                       '&pgstar\n',
                       '/\n'])
