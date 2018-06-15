@@ -23,6 +23,9 @@ if args.d:
     T_c = float(lines[i][1].replace('d','e')) + args.T_c
 else:
     T_c = args.T_c
+
+if T_c >= 1e6:
+    raise ValueError('central temperature {:.3e} K, must be less than 1e6 K'.format(T_c))
     
 lines[i][1] = ' {:.16g}d5\n'.format(T_c/1e5)
 
