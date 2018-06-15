@@ -14,8 +14,6 @@
 
 module purge; module load bluebear  # this line is required
 
-export OMP_NUM_THREADS=$SLURM_NTASKS
-echo OMP_NUM_THREADS $OMP_NUM_THREADS
 echo $SECTOR
 ID=$(printf "%04d" $SLURM_ARRAY_TASK_ID)
 cd $SLURM_SUBMIT_DIR/$SECTOR/$ID

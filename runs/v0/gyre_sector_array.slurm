@@ -14,7 +14,7 @@
 
 module purge; module load bluebear  # this line is required
 
-export OMP_NUM_THREADS=$SLURM_NTASKS
+export OMP_NUM_THREADS=1
 echo OMP_NUM_THREADS $OMP_NUM_THREADS
 echo $SECTOR
 export GYRE_DIR=/rds/homes/b/ballwh/code/gyre/fork

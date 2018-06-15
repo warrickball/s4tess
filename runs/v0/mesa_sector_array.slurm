@@ -7,7 +7,8 @@
 # e.g. sbatch --export=SECTOR=00 mesa_sector_array.slurm
 
 #SBATCH --nodes 1
-#SBATCH --tasks 2
+#SBATCH --tasks 1
+#SBATCH --cpus-per-task 2
 #SBATCH --mem 4G
 #SBATCH --time 00:40:00
 #SBATCH --output slurm/mesa_sector_array_%A_%a.out
@@ -17,7 +18,7 @@
 module purge; module load bluebear  # this line is required
 module load scipy/0.19.0-python-3.5.2
 
-export OMP_NUM_THREADS=$SLURM_NTASKS
+export OMP_NUM_THREADS=2
 echo OMP_NUM_THREADS $OMP_NUM_THREADS
 echo $SECTOR
 export MESA_DIR=/rds/projects/2017/ballwh-stellar-modelling/mesa/7385
@@ -44,7 +45,8 @@ fi
 
 echo TRY $TRIES > mesa.log
 ./rn >> mesa.log
-while grep --quiet convergence mesa.log && ((TRIES <= MAXTRIES))
+# while grep --quiet convergence mesa.log && ((TRIES <= MAXTRIES))
+while [ ! -f final.profile.GYRE ] && ((TRIES <= MAXTRIES))
 do
     python3 ../../../../scripts/modify_Tc.py inlist_run 1000 -d
     ((TRIES++))
