@@ -13,11 +13,15 @@ parser.add_argument('cat', type=str,
 parser.add_argument('output', type=str,
                     help="""base output filename for Python format statement
                     (e.g. sector00/{:04d}/cat_data.txt)""")
+parser.add_argument('-N', type=int, default=-1,
+                    help="number of stars for which to create input (default=all of them)")
 parser.add_argument('--verbose', '-v', action='store_const', const=True,
                     default=False, help="show progress")
 args = parser.parse_args()
 
 cat = np.load(args.cat)
+if args.N > 0:
+    cat = cat[:args.N]
 
 for i, row in enumerate(cat):
     if args.verbose:
