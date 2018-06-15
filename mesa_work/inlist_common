@@ -20,6 +20,9 @@
 
 
 &controls
+    x_ctrl(3) = 150d0
+    x_ctrl(4) = 0.03d0
+
     write_pulse_info_with_profile = .true.
     pulse_info_format = 'GYRE'
     add_atmosphere_to_pulse_info = .true.

@@ -114,8 +114,8 @@
          chi2 = chi2_prev
          if (s% star_age > 0.97d0*s% max_age/1.1d0 .or. &
              s% star_age > 0.97d0*(s% max_age - 0.2d9)) then
-            chi2 = (s% Teff - s% x_ctrl(1))**2/200d0**2 &
-                 + (log10_cr(s% photosphere_L) - s% x_ctrl(2))**2/0.04d0**2
+            chi2 = (s% Teff - s% x_ctrl(1))**2/s% x_ctrl(3)**2 &
+                 + (log10_cr(s% photosphere_L) - s% x_ctrl(2))**2/s% x_ctrl(4)**2
             write(*,*) 'chi2, chi2_prev', chi2, chi2_prev
             if ((chi2 > chi2_prev) .and. (chi2_prev < 1d0)) extras_check_model = terminate
          end if
@@ -142,11 +142,13 @@
          ierr = 0
          call star_ptr(id, s, ierr)
          if (ierr /= 0) return
-         how_many_extra_history_columns = 0
+         how_many_extra_history_columns = 1
       end function how_many_extra_history_columns
       
       
       subroutine data_for_extra_history_columns(id, id_extra, n, names, vals, ierr)
+         use crlibm_lib, only: log10_cr
+
          integer, intent(in) :: id, id_extra, n
          character (len=maxlen_history_column_name) :: names(n)
          real(dp) :: vals(n)
@@ -159,7 +161,10 @@
          !note: do NOT add the extras names to history_columns.list
          ! the history_columns.list is only for the built-in log column options.
          ! it must not include the new column names you are adding here.
-         
+
+         names(1) = 'chi2'
+         vals(1) = (s% Teff - s% x_ctrl(1))**2/200d0**2 &
+              + (log10_cr(s% photosphere_L) - s% x_ctrl(2))**2/0.04d0**2
 
       end subroutine data_for_extra_history_columns
 
