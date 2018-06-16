@@ -16,9 +16,9 @@ if args.verbose:
 
 for star, row in enumerate(sectors):
     if args.verbose:
-        print('\rProcessing star %i...', end='')
+        print('\rProcessing star %i...' % star, end='')
     try:
-        with open('unique/%05i/%05_WN.asc' % (star, star), 'r') as f:
+        with open('unique/%05i/unique_%05i_WN.asc' % (star, star), 'r') as f:
             lines = f.readlines()
     except FileNotFoundError:
         continue
@@ -27,7 +27,7 @@ for star, row in enumerate(sectors):
         if rank < 0:
             continue
         else:
-            with open('unique/%05i/%05_WN_%02i_%04i_WN.asc'
+            with open('unique/%05i/unique_%05i_WN_%02i_%04i.asc'
                       % (star, star, sector, rank), 'w') as f:
                 f.writelines(lines[sector*N:sector*N+N])
                 

@@ -59,9 +59,11 @@ def schofield(Imag, Teff, ELon=0.0, ELat=30.0, GLon=96.0, GLat=-30.0,
     dlat = abs(GLat)/40.0
 
     dlon = GLon
-    q = np.where(dlon > 180.0)
-    if len(q[0]) > 0:
-    	dlon[q] = 360.0 - dlon[q]
+    # q = np.where(dlon > 180.0)
+    # if len(q[0]) > 0:
+    # 	dlon[q] = 360.0 - dlon[q]
+    if dlon > 180.0:
+        dlon = 360.0 - dlon
 
     dlon = abs(dlon)/180.0
     p = [18.97338, 8.833, 4.007, 0.805]
