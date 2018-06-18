@@ -10,10 +10,10 @@
 #SBATCH --tasks 1
 #SBATCH --cpus-per-task 2
 #SBATCH --mem 4G
-#SBATCH --time 00:40:00
-#SBATCH --output slurm/mesa_sector_array_%A_%a.out
-#SBATCH --error slurm/mesa_sector_array_%A_%a.err
-#SBATCH --array 0-399
+#SBATCH --time 00:30:00
+#SBATCH --output slurm/MESA_sector_array_%A_%a.out
+#SBATCH --error slurm/MESA_sector_array_%A_%a.err
+#SBATCH --array 0-199
 
 module purge; module load bluebear  # this line is required
 module load scipy/0.19.0-python-3.5.2
@@ -22,7 +22,7 @@ export OMP_NUM_THREADS=2
 echo OMP_NUM_THREADS $OMP_NUM_THREADS
 echo $SECTOR
 export MESA_DIR=/rds/projects/2017/ballwh-stellar-modelling/mesa/7385
-cd $SLURM_SUBMIT_DIR/$SECTOR/$(printf "%04d" $SLURM_ARRAY_TASK_ID)
+cd $SLURM_SUBMIT_DIR/$SECTOR/$(printf "%05d" $SLURM_ARRAY_TASK_ID)
 pwd
 if [ -f final.profile.GYRE ]
 then

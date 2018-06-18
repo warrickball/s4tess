@@ -7,10 +7,10 @@
 #SBATCH --nodes 1
 #SBATCH --tasks 1
 #SBATCH --mem 1G
-#SBATCH --time 00:12:00
-#SBATCH --output slurm/gyre_sector_array_%A_%a.out
-#SBATCH --error slurm/gyre_sector_array_%A_%a.err
-#SBATCH --array 0-399
+#SBATCH --time 00:15:00
+#SBATCH --output slurm/GYRE_sector_array_%A_%a.out
+#SBATCH --error slurm/GYRE_sector_array_%A_%a.err
+#SBATCH --array 0-199
 
 module purge; module load bluebear  # this line is required
 
@@ -18,7 +18,7 @@ export OMP_NUM_THREADS=1
 echo OMP_NUM_THREADS $OMP_NUM_THREADS
 echo $SECTOR
 export GYRE_DIR=/rds/homes/b/ballwh/code/gyre/fork
-ID=$(printf "%04d" $SLURM_ARRAY_TASK_ID)
+ID=$(printf "%05d" $SLURM_ARRAY_TASK_ID)
 cd $SLURM_SUBMIT_DIR/$SECTOR/$ID
 pwd
 if [ -f gyre_summary.txt ]

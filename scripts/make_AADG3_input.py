@@ -32,6 +32,8 @@ parser.add_argument('--splitting', type=float, default=-1,
                     help="constant rotation splitting, ignored if < 0, "
                     "in which case rotation is taken from summary "
                     "if available, otherwise rotation = 0 (default -1)")
+parser.add_argument('--min-H', type=float, default=-1,
+                    help="minimum for height H (default=-1, i.e. keep all modes)")
 args = parser.parse_args()
 
 header, summary = gyre.load_summary(args.summary)
@@ -108,8 +110,9 @@ width = np.exp(logW_meta(nu, numax, Teff, *p25))/Q
 
 H = Henv*np.exp(-(nu-numax)**2/2./cenv**2)/Q
 amp2 = H*Dnu
+I = H > args.min_H
 
-np.savetxt(args.namecon, np.vstack([l, n, nu, width, amp2, 0.0*nu]).T,
+np.savetxt(args.namecon, np.vstack([l, n, nu, width, amp2, 0.0*nu]).T[I],
            fmt=['%2i','  %5i','  %12.7e','  %12.7e','  %12.7e','  %12.8e'])
 
 if args.splitting >= 0:
@@ -122,7 +125,7 @@ else:
         
 
 with open(args.namerot, 'w') as f:
-    for ni, li, dnu_roti in zip(n, l, dnu_rot):
+    for ni, li, dnu_roti in zip(n[I], l[I], dnu_rot[I]):
         for m in range(1, li+1):
             f.write('%5i%3i%3i%12.7f\n' % (ni, li, m, dnu_roti))
 

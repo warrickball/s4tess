@@ -20,7 +20,7 @@ Cross matches catalogues and generates priority target lists.
 
 ### Run MESA
 
-    seq -w 00 25 | xargs -I{} sbatch --export=SECTOR={} mesa_sector_array.slurm
+    seq -w 00 25 | xargs -I{} sbatch --export=SECTOR={} MESA_sector_array.slurm
 
 Skips folders in which ``final.profile.GYRE`` exists.
 
@@ -30,7 +30,7 @@ Skips folders in which ``final.profile.GYRE`` exists.
 
 ### Run GYRE
 
-    seq -w 00 25 | xargs -I{} sbatch --export=SECTOR={} gyre_sector_array.slurm
+    seq -w 00 25 | xargs -I{} sbatch --export=SECTOR={} GYRE_sector_array.slurm
 
 Skips folders in which ``gyre_summary.txt`` exists.
 
