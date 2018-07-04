@@ -6,7 +6,8 @@ from tomso import gyre, mesa
 from argparse import ArgumentParser
 
 def BV_to_Teff(BV):
-    # coefficients as in Table 2, which is reverse of polyval input
+    # coefficients as in Torres (2010), Table 2,
+    # which is reverse of polyval input
     p = [3.979145106714099, -0.654992268598245, 1.740690042385095,
          -4.608815154057166, 6.792599779944473, -5.396909891322525,
          2.192970376522490, -0.359495739295671]

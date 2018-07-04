@@ -28,6 +28,8 @@ parser.add_argument('--verbose', '-v', action='store_const', const=True,
 parser.add_argument('--Tc', type=str,
                     default='/home/ADF/ballwh/work/s4tess/data/Tc.dat',
                     help="filename of central temperature data")
+parser.add_argument('--nofit', action='store_const', const=True, default=False,
+                    help="don't try to fit Teff and logL, just evolve to age")
 parser.add_argument('-N', type=int, default=[], nargs='+',
                     help="number of stars for which to create input "
                     "(default=all of them); if one number, do that many "
@@ -53,22 +55,24 @@ try:
     end = args.N[1]+1
     start = args.N[0]
 except IndexError:
-    end = len(tri)
+    start = 0
     try:
-        start = args.N[0]
+        end = args.N[0]
     except IndexError:
-        start = 0
+        end = len(tri)
 
 vprint("Selecting rows from {:d} to {:d}...".format(start, end-1))
         
 for i, row in enumerate(tri[start:end]):
     vprint('\rCreating star {:d} of {:d}...'.format(i+1, end-start), end='')
 
-    Teff = 10.**row['logTe']
-    log_L = row['logL']
+    Teff = 1e12 if args.nofit else 10.**row['logTe']
+    log_L = 1e12 if args.nofit else row['logL']
         
     t = 10.**row['logAge']/1e9
-    t = np.maximum(1.1*t, t + 0.2)
+    if not args.nofit:
+        t = np.maximum(1.1*t, t + 0.2)
+
     M = row['m_ini']
     Z = 10.**row['M_H']*Zsun  # as described in paper
     Y = Yp + dY_dZ*Z

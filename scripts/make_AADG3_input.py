@@ -57,7 +57,7 @@ sig = np.sqrt(L**2/M**3/(Teff/Teff_sun)**5.5*(numax/numax_sun))*sig_sun
 namelist = OrderedDict()
 namelist['user_seed'] = np.random.randint(100, 2**28-1)
 namelist['cadence'] = 120.0
-namelist['n_cadences'] = 19440
+namelist['n_cadences'] = 19440*13
 namelist['n_relax'] = 4320
 namelist['n_fine'] = 50
 namelist['sig'] = sig
@@ -102,10 +102,10 @@ Q = E/np.interp(nu, nu[l==0], E[l==0])
 
 # width = scaling.lund_width(nu, numax)/Q
 # using 25 of Guy's red giants
-p25 = [-3.71033159e+00, 1.07268220e-03, 1.88285544e-04, -7.20902433e+01,
-       1.54336225e-02, 9.10050555e-04, -2.26620472e-01, 5.08279583e-05,
-       2.71537654e-06, -2.18970560e+03, 4.30163078e-01, 8.42663954e-01,
-       -5.63927133e-01, 1.13801669e-04, 1.31215914e-04]
+p25 = [-3.71033159e+00,  1.07268220e-03,  1.88285544e-04, -7.20902433e+01,
+        1.54336225e-02,  9.10050555e-04, -2.26620472e-01,  5.08279583e-05,
+        2.71537654e-06, -2.18970560e+03,  4.30163078e-01,  8.42663954e-01,
+       -5.63927133e-01,  1.13801669e-04,  1.31215914e-04]
 width = np.exp(logW_meta(nu, numax, Teff, *p25))/Q
 
 H = Henv*np.exp(-(nu-numax)**2/2./cenv**2)/Q
