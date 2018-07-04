@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# remember: MESA takes about 15 core minutes per star
 # when using this command, you must export the SECTOR variable
-# e.g. sbatch --export=SECTOR=00 mesa_sector_array.slurm
+# and specify the array range
+# e.g. sbatch --export=SECTOR="north" --array=0-99 GYRE_sector_array.slurm
 
 #SBATCH --nodes 1
 #SBATCH --tasks 1
@@ -10,7 +10,6 @@
 #SBATCH --time 00:15:00
 #SBATCH --output slurm/GYRE_sector_array_%A_%a.out
 #SBATCH --error slurm/GYRE_sector_array_%A_%a.err
-#SBATCH --array 0-199
 
 module purge; module load bluebear  # this line is required
 

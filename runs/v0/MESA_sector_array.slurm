@@ -1,19 +1,16 @@
 #!/usr/bin/env bash
 
-# remember: MESA takes about 15 core minutes per star but we need a
-# lot of slack in case star has to keep retrying
-
 # when using this command, you must export the SECTOR variable
-# e.g. sbatch --export=SECTOR=00 mesa_sector_array.slurm
+# and specify the array range
+# e.g. sbatch --export=SECTOR="north" --array=0-99 MESA_sector_array.slurm
 
 #SBATCH --nodes 1
 #SBATCH --tasks 1
 #SBATCH --cpus-per-task 2
 #SBATCH --mem 4G
-#SBATCH --time 00:30:00
+#SBATCH --time 00:40:00
 #SBATCH --output slurm/MESA_sector_array_%A_%a.out
 #SBATCH --error slurm/MESA_sector_array_%A_%a.err
-#SBATCH --array 0-199
 
 module purge; module load bluebear  # this line is required
 module load scipy/0.19.0-python-3.5.2
