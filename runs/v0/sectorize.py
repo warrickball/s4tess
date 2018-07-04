@@ -8,11 +8,14 @@ def vprint(*print_args, **kwargs):
         print(*print_args, **kwargs)
 
 parser = ArgumentParser()
+parser.add_argument('hemisphere', type=str,
+                    choices=['north', 'south'],
+                    help="which hemisphere ('north' or 'south')")
 parser.add_argument('-v', '--verbose', action='store_const',
                     const=True, default=False)
 args = parser.parse_args()
 
-sectors = np.load('data/sectors.npy')
+sectors = np.load('data/sectors_%s.npy' % args.hemisphere)
 N = 19440
 
 vprint('')
@@ -21,7 +24,7 @@ for star, row in enumerate(sectors):
     vprint('\rProcessing star %i...' % star, end='')
 
     try:
-        with open('unique/%05i/%05i_WN.asc' % (star, star), 'r') as f:
+        with open('%s/%05i/%05i_WN.asc' % (args.hemisphere, star, star), 'r') as f:
             lines = f.readlines()
     except FileNotFoundError:
         continue
@@ -30,8 +33,8 @@ for star, row in enumerate(sectors):
         if rank < 0:
             continue
         else:
-            with open('unique/%05i/%05i_WN_%02i_%04i.asc'
-                      % (star, star, sector, rank), 'w') as f:
+            with open('%s/%05i/%05i_WN_%02i_%04i.asc'
+                      % (args.hemisphere, star, star, sector, rank), 'w') as f:
                 f.writelines(lines[sector*N:sector*N+N])
                 
 vprint('\nDone.')
