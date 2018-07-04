@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-# given a folder, create AADG3 input for one run
+# given a timeseries, save power spectrum, with AADG3 model
 
 OLDPWD=$(pwd)
 # BASENAME=$(echo $1 | sed 's:/:_:g')
-BASENAME=$(basename $1)
-cd $1
-python3 ../../../../scripts/save_AADG3_PS.py $BASENAME.in $BASENAME.pow
+DIRNAME=$(dirname $1)
+FILENAME=$(basename $1 .asc)
+ID=$(basename $DIRNAME)
+cd $DIRNAME
+python3 ../../../../scripts/save_AADG3_PS.py "$ID".in "$FILENAME".pow --nameout "$FILENAME".asc
 cd $OLDPWD
