@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import numpy as np
-import matplotlib.pyplot as pl
 import AADG3
 from astropy.stats import LombScargle
 from argparse import ArgumentParser

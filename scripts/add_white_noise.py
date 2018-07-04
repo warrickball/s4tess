@@ -84,15 +84,13 @@ tri = {}  # TRILEGAL data
 with open(args.tri, 'r') as f:
     for line in f.readlines():
         k, v = line.split('=')
-        v = float(v)
-        tri[k.strip()] = v
+        tri[k.strip()] = float(v)
 
 atl = {}  # ATL data
 with open(args.atl, 'r') as f:
     for line in f.readlines():
         k, v = line.split('=')
-        v = float(v)
-        atl[k.strip()] = v
+        atl[k.strip()] = float(v)
 
 if args.model == 'stassun':
     sigma = stassun(tri['imag'])
