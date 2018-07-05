@@ -69,11 +69,9 @@ parser.add_argument('history', type=str,
 parser.add_argument('-o', '--output', type=str, default=None,
                  help="Filename for output GYRE model "
                  "(default=append .rot to source model filename)")
-parser.add_argument('--no-core-noise', action='store_const',
-                    const=True, default=False,
+parser.add_argument('--no-core-noise', action='store_true',
                     help="don't randomly sample uncertainty in core rotation rate")
-parser.add_argument('--no-env-noise', action='store_const',
-                    const=True, default=False,
+parser.add_argument('--no-env-noise', action='store_true',
                     help="don't randomly sample uncertainty in envelope rotation rate")
 args = parser.parse_args()
 

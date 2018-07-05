@@ -20,7 +20,7 @@ parser.add_argument('--data-dir', type=str,
                     help="directory containing TRILEGAL output (default=RDS grids)")
 parser.add_argument('--basename', type=str, default='triout_{:d}.fits',
                     help="base filename of TRILEGAL output files (default='triout_{:d}.fits')")
-parser.add_argument('-v', '--verbose', action='store_const', const=True, default=False,
+parser.add_argument('-v', '--verbose', action='store_true',
                     help="print progress")
 args = parser.parse_args()
 

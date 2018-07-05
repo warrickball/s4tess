@@ -8,7 +8,7 @@ converge.""")
 parser.add_argument('inlist', type=str, help="filename of inlist")
 parser.add_argument('T_c', type=float, 
                     help="initial central temperature (pre_ms_T_c in MESA)")
-parser.add_argument('-d', action='store_const', const=True, default=False, 
+parser.add_argument('-d', action='store_true',
                     help="input value is a temperature difference rather than a temperature")
 parser.add_argument('-o', '--output', type=str, default=None,
                     help="filename for output (defaults to input inlist)")

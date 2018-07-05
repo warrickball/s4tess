@@ -35,8 +35,7 @@ parser.add_argument('source', type=str, help="filename for input data")
 parser.add_argument('output', type=str, help="base filename for output")
 parser.add_argument('-N', '--Ntargets', type=int, default=1000,
                     help="number of targets per sector (default=1000)")
-parser.add_argument('-v', '--verbose', action='store_const',
-                    const=True, default=False)
+parser.add_argument('-v', '--verbose', action='store_true')
 args = parser.parse_args()
 
 Nsectors = 26  # 13 North, 13 South

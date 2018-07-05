@@ -23,12 +23,12 @@ parser.add_argument('--inlist', type=str, default='inlist_run',
                     help="filename for MESA inlist (default inlist_run)")
 parser.add_argument('--tri-data', type=str, default=None,
                     help="save TRILEGAL data as text to this filename")
-parser.add_argument('--verbose', '-v', action='store_const', const=True,
-                    default=False, help="show progress")
+parser.add_argument('--verbose', '-v', action='store_true',
+                    help="show progress")
 parser.add_argument('--Tc', type=str,
                     default='/home/ADF/ballwh/work/s4tess/data/Tc.dat',
                     help="filename of central temperature data")
-parser.add_argument('--nofit', action='store_const', const=True, default=False,
+parser.add_argument('--nofit', action='store_true',
                     help="don't try to fit Teff and logL, just evolve to age")
 parser.add_argument('-N', type=int, default=[], nargs='+',
                     help="number of stars for which to create input "

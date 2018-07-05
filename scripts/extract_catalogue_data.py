@@ -23,8 +23,8 @@ parser.add_argument('-N', type=int, default=[], nargs='+',
                     "(default=all of them); if one number, do that many "
                     "stars starting from 0; if two numbers go from first "
                     "number to second *inclusive* (to match `seq`)")
-parser.add_argument('--verbose', '-v', action='store_const', const=True,
-                    default=False, help="show progress")
+parser.add_argument('--verbose', '-v', action='store_true',
+                    help="show progress")
 args = parser.parse_args()
 
 cat = np.load(args.cat)

@@ -19,8 +19,8 @@ parser.add_argument('atl', type=str,
                     help="name of NumPy binary containing ATL output")
 parser.add_argument('-o', '--output', type=str, default=None,
                     help="filename for TRILEGAL matches")
-parser.add_argument('-v', '--verbose', action='store_const', const=True,
-                    default=False, help="show cross-matching data while script runs")
+parser.add_argument('-v', '--verbose', action='store_true',
+                    help="show cross-matching data while script runs")
 args = parser.parse_args()
 
 print('Loading TRILEGAL data...')
