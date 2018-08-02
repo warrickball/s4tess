@@ -16,7 +16,7 @@ parser.add_argument('-o', '--output', type=str, default=None,
                     "with `.asc` replaced with `.fits`.  If the input filename "
                     "doesn't end with `.asc`, the output file is just the input "
                     "filename with `.fits` appended.")
-args = parser.parse_args(['../runs/v0/north/00000/00000_WN_05_0000.asc'])
+args = parser.parse_args()
 
 ascname = args.asc.split('/')[-1]
 folder = '/'.join(args.asc.split('/')[:-1])
@@ -45,6 +45,8 @@ with open(basename + '.atl', 'r') as f:
         k, v = line.split('=')
         atl[k.strip()] = float(v)
 
+v = np.loadtxt(basename + '.vr')
+
 history_header, history_data = mesa.load_history(folder + '/LOGS/history.data')
 profile_header, profile_data = mesa.load_profile(folder + '/final.profile.GYRE')
     
@@ -55,6 +57,7 @@ header['TEFF'] = (10.**history_data[-1]['log_Teff'], '[K] Effective temperature'
 header['LOGG'] = (history_data[-1]['log_g'], '[cm/s2] log10 surface gravity')
 header['SECTOR'] = (sector, 'Observing sector')
 header['RADIUS'] = (10.**history_data[-1]['log_R'], '[solar radii] stellar radius')
+header['V_R'] = (v, '[km/s] radial velocity')
 
 flux = np.loadtxt(args.asc)
 data = np.zeros(len(flux), dtype=[('TIME', '>f8'), ('FLUX', '>f4'), ('CADENCENO', '>i4')])
