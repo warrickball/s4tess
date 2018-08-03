@@ -13,7 +13,8 @@ TOP=../..
 
 for STAR in $(seq -w $2 $3)
 do
-    mkdir -p $1/$STAR
+    mkdir -p $1/$STAR/LOGS
+    mkdir -p $1/$STAR/photos
     cp -n $TOP/template/* "$1"/$STAR/
 done
 python3 $TOP/scripts/make_MESA_input.py data/tri_"$1".npy "$1"/{:05d} -v --Tc $TOP/data/Tc.dat -N $2 $3
