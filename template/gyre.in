@@ -9,22 +9,21 @@
 
 &mode
 	l = 0
-	tag = 'radial'
 /
 
 &mode
 	l = 1
-	tag = 'non-radial'
+	tag = 'l=1'
 /
 
 &mode
 	l = 2
-	tag = 'non-radial'
+	tag = 'l=2'
 /
 
 &mode
 	l = 3
-	tag = 'non-radial'
+	tag = 'l=3'
 /
 
 &osc
@@ -44,17 +43,37 @@
 	freq_max = 0.95
 	freq_min_units = 'ACOUSTIC_CUTOFF'
 	freq_max_units = 'ACOUSTIC_CUTOFF'
-	n_freq = 300
+	n_freq = 400
 /
 
 &scan
 	grid_type = 'INVERSE'
 	freq_min = 0.15
-	freq_max = 0.50
+	freq_max = 0.95
 	freq_min_units = 'ACOUSTIC_CUTOFF'
 	freq_max_units = 'ACOUSTIC_CUTOFF'
-	n_freq = 600
-	tag_list = 'non-radial'
+	n_freq = 800
+	tag_list = 'l=1'
+/
+
+&scan
+	grid_type = 'INVERSE'
+	freq_min = 0.15
+	freq_max = 0.95
+	freq_min_units = 'ACOUSTIC_CUTOFF'
+	freq_max_units = 'ACOUSTIC_CUTOFF'
+	n_freq = 1500
+	tag_list = 'l=2'
+/
+
+&scan
+	grid_type = 'INVERSE'
+	freq_min = 0.15
+	freq_max = 0.95
+	freq_min_units = 'ACOUSTIC_CUTOFF'
+	freq_max_units = 'ACOUSTIC_CUTOFF'
+	n_freq = 2000
+	tag_list = 'l=3'
 /
 
 &grid
