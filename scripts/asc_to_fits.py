@@ -7,7 +7,7 @@ from datetime import datetime
 from argparse import ArgumentParser
 
 parser = ArgumentParser(description="""Takes results of S4TESS
-simulation and writes a MAST-like FITS file.""")
+simulation and writes a vaguely MAST-like FITS file.""")
 parser.add_argument('asc', type=str,
                     help="Filename of output timeseries (usually *_WN_*.asc).")
 parser.add_argument('-o', '--output', type=str, default=None,
@@ -16,7 +16,7 @@ parser.add_argument('-o', '--output', type=str, default=None,
                     "with `.asc` replaced with `.fits`.  If the input filename "
                     "doesn't end with `.asc`, the output file is just the input "
                     "filename with `.fits` appended.")
-args = parser.parse_args()
+args = parser.parse_args(['../runs/v0/south/00000/00000_WN_11_0000.asc'])
 
 ascname = args.asc.split('/')[-1]
 folder = '/'.join(args.asc.split('/')[:-1])
@@ -45,7 +45,7 @@ with open(basename + '.atl', 'r') as f:
         k, v = line.split('=')
         atl[k.strip()] = float(v)
 
-v = np.loadtxt(basename + '.vr')
+v = np.loadtxt(basename + '.vr')[()]
 
 history_header, history_data = mesa.load_history(folder + '/LOGS/history.data')
 profile_header, profile_data = mesa.load_profile(folder + '/final.profile.GYRE')
@@ -65,10 +65,19 @@ data['FLUX'] = flux
 data['CADENCENO'] = sector*19440 + np.arange(len(flux), dtype=int)
 data['TIME'] = 120.0*data['CADENCENO']/86400.0
 
+modes = np.loadtxt(basename + '.con',
+                   dtype=[('l', '>i4'), ('n', '>i4'), ('nu', '>f8'),
+                          ('width', '>f8'), ('amp2', '>f8'), ('rot', '>f8')])
+
+rot = np.genfromtxt(basename + '.rot', names=['n', 'l', 'm', 'dnu'])
+modes['rot'][modes['l']>0] = rot[rot['m']==1]['dnu']
+
 hdul = fits.HDUList([fits.PrimaryHDU(header=header), fits.BinTableHDU(data),
                      fits.TableHDU(header=fits.Header(atl), name='ATL'),
-                     fits.TableHDU(header=fits.Header(tri), name='TRILEGAL')])
+                     fits.TableHDU(header=fits.Header(tri), name='TRILEGAL'),
+                     fits.BinTableHDU(modes)])
 hdul.writeto(fitsname, overwrite=True)
 
 test = fits.open(fitsname)
 print(test[0].header)
+test.close()

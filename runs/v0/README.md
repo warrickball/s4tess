@@ -59,6 +59,10 @@ Skips folders in which ``"$ID".asc`` exists.
 
 Skips folders where ``"$ID"_WN.asc`` doesn't exist.
 
+### Convert output to FITS
+
+    ls north/*/*_WN_*.asc | xargs -t -n1 python3 ../../scripts/asc_to_fits.py
+
 ### Save power spectra
 
     ls north/*/*_WN_*.asc | xargs -n1 dirname | xargs -t -n1 bash save_AADG3_PS.sh
