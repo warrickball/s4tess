@@ -36,6 +36,9 @@ parser.add_argument('output', type=str, help="base filename for output")
 parser.add_argument('-N', '--Ntargets', type=int, default=1000,
                     help="number of targets per sector (default=1000)")
 parser.add_argument('-v', '--verbose', action='store_true')
+parser.add_argument('--start-lon', type=float, default=315.8,
+                    help="ecliptic longitude of first observing sector, "
+                    "in degrees (default=315.8)")
 args = parser.parse_args()
 
 Nsectors = 26  # 13 North, 13 South
@@ -51,8 +54,10 @@ if args.verbose:
     
 for i, row in enumerate(data):
     
-    sectors_N = np.hstack([tess_fields_vector(row['ELon'], row['ELat'])[0],
-                           tess_fields_vector(row['ELon'], -row['ELat'])[0]])
+    sectors_N = np.hstack([
+        tess_fields_vector(row['ELon']-args.start_lon, row['ELat'])[0],
+        tess_fields_vector(row['ELon']-args.start_lon, -row['ELat'])[0]
+    ])
     
     for j, sector in enumerate(sectors_N):
         if sector and len(I[j]) < args.Ntargets:
