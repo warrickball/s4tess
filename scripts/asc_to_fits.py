@@ -21,6 +21,7 @@ args = parser.parse_args(['../runs/v0/south/00000/00000_WN_11_0000.asc'])
 forms = {'J': 'column format: signed 32-bit integer',
          'D': 'column format: 64-bit floating point',
          'E': 'column format: 32-bit floating point'}
+cads_per_sector = 720*137//5  # (cadences/day)*(days/sector)
 
 ascname = args.asc.split('/')[-1]
 folder = '/'.join(args.asc.split('/')[:-1])
@@ -127,7 +128,7 @@ header['V_R'] = (v, '[km/s] radial velocity')
 flux = np.loadtxt(args.asc)
 data = np.zeros(len(flux), dtype=[('TIME', '>f8'), ('FLUX', '>f4'), ('CADENCENO', '>i4')])
 data['FLUX'] = flux
-data['CADENCENO'] = sector*19440 + np.arange(len(flux), dtype=int)
+data['CADENCENO'] = sector*cads_per_sector + np.arange(len(flux), dtype=int)
 data['TIME'] = 120.0*data['CADENCENO']/86400.0
 
 data_fits = fits.BinTableHDU(data)

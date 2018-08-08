@@ -16,7 +16,7 @@ parser.add_argument('-v', '--verbose', action='store_const',
 args = parser.parse_args()
 
 sectors = np.load('data/sectors_%s.npy' % args.hemisphere)
-N = 19440
+N = 720*137//5  # (cadences/day)*(days/sector)
 
 vprint('')
 

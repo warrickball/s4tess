@@ -68,7 +68,7 @@ np.random.seed(int(sha1((args.summary + args.atl + args.baseout).encode('utf-8')
 namelist = OrderedDict()
 namelist['user_seed'] = np.random.randint(100, 2**28-1)
 namelist['cadence'] = 120.0
-namelist['n_cadences'] = 19440*13
+namelist['n_cadences'] = 13*720*137//5  # n_sectors*(cadences/day)*(days/sector=27.4d)
 namelist['n_relax'] = 4320
 namelist['n_fine'] = 50
 namelist['sig'] = sig
