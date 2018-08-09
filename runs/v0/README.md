@@ -41,7 +41,7 @@ Skips folders in which ``gyre_summary.txt`` exists.
 
 ### Make AADG3 input
 
-    ls north/*/gyre_summary.txt | xargs -n1 dirname | xargs -t -n1 bash make_AADG3_input.sh
+    ls north/*/gyre_summary.txt | xargs -n1 dirname | xargs -t -n1 python3 ../../scripts/make_AADG3_input.py
 
 ### Run AADG3
 
