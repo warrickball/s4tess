@@ -1,22 +1,35 @@
 #!/usr/bin/env python
 
 import numpy as np
+from tools import save_txt, load_txt
 from argparse import ArgumentParser
 
 parser = ArgumentParser(description=
 """Add white noise to a lightcurve, either using the formula in
-Stassun et al. (2017) or Mat Schofield and Bill Chaplin's formula.""")
-parser.add_argument('atl', type=str,
-                    help="plain text file with ATL data")
-parser.add_argument('tri', type=str,
-                    help="plain text file with TRILEGAL data")
-parser.add_argument('lc_in', type=str,
-                    help='filename of input lightcurve')
-parser.add_argument('lc_out', type=str,
-                    help='filename of output lightcurve')
+Stassun et al. (2017) or Mat Schofield and Bill Chaplin's formula.
+
+All files are named based on the following convention with the
+`basename` argument:
+
+* the ATL data is in `basename.atl`,
+* the TRILEGAL data is in `basename.tri`,
+* the white noise value is saved to `basename.xtras`,
+* the input light curve (without white noise) is in `basename.asc`, and
+* the output light curve (after adding white noise) is in `basename_WN.asc`.""")
+
+parser.add_argument('basename', type=str, help="base string for filenames")
+# parser.add_argument('atl', type=str,
+#                     help="plain text file with ATL data")
+# parser.add_argument('tri', type=str,
+#                     help="plain text file with TRILEGAL data")
+# parser.add_argument('lc_in', type=str,
+#                     help='filename of input lightcurve')
+# parser.add_argument('lc_out', type=str,
+#                     help='filename of output lightcurve')
 parser.add_argument('--model', type=str, default='schofield',
                     choices=['schofield', 'stassun'],
                     help="choice of noise model")
+parser.add_argument('-v', '--verbose', action='store_true')
 args = parser.parse_args()
 
 def stassun(Imag):
@@ -80,24 +93,43 @@ def schofield(Imag, Teff, ELon=0.0, ELat=30.0, GLon=96.0, GLat=-30.0,
     return noise*1e6*np.sqrt(cadence/3600.0)  # parts x sqrt(hr) -> ppm * sqrt(cadence)
 
 
-tri = {}  # TRILEGAL data
-with open(args.tri, 'r') as f:
-    for line in f.readlines():
-        k, v = line.split('=')
-        tri[k.strip()] = float(v)
+def vprint(msg):
+    if args.verbose:
+        print(msg, end='', flush=True)
 
-atl = {}  # ATL data
-with open(args.atl, 'r') as f:
-    for line in f.readlines():
-        k, v = line.split('=')
-        atl[k.strip()] = float(v)
+vprint('Loading TRILEGAL data... ')
+tri = load_txt('%s.tri' % args.basename)
+vprint('Done.\n')
+
+vprint('Loading ATL data... ')
+atl = load_txt('%s.atl' % args.basename)
+vprint('Done.\n')
 
 if args.model == 'stassun':
+    vprint('Computing white noise using `stassun`... ')
     sigma = stassun(tri['imag'])
 elif args.model == 'schofield':
+    vprint('Computing white noise using `schofield`... ')
     sigma = schofield(tri['imag'], atl['teff'], atl['ELon'],
                       atl['ELat'], atl['GLon'], atl['GLat'])
-        
-asc = np.loadtxt(args.lc_in)
+
+vprint('Done.\n')
+    
+try:
+    vprint('Loading extras data... ')
+    xtras = load_txt('%s.xtras' % args.basename)
+except FileNotFoundError:
+    vprint("\nCouldn't find file `%s.xtras`.  Creating empty dict. " % args.basename)
+    xtras = {}
+
+vprint('Done.\nSaving white noise to extras... ')
+
+xtras['sigma_WN'] = sigma
+save_txt('%s.xtras' % args.basename, xtras)
+
+vprint('Done.\nAdding white noise to lightcurve... ')
+    
+asc = np.loadtxt('%s.asc' % args.basename)
 asc = asc + np.random.randn(len(asc))*sigma
-np.savetxt(args.lc_out, asc, fmt='%16.7f')
+np.savetxt('%s_WN.asc' % args.basename, asc, fmt='%16.7f')
+vprint('Done.\n')

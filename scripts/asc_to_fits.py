@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
+from tools import load_txt
 from tomso import mesa
 from astropy.io import fits
 from datetime import datetime
@@ -16,7 +17,8 @@ parser.add_argument('-o', '--output', type=str, default=None,
                     "with `.asc` replaced with `.fits`.  If the input filename "
                     "doesn't end with `.asc`, the output file is just the input "
                     "filename with `.fits` appended.")
-args = parser.parse_args(['../runs/v0/south/00000/00000_WN_11_0000.asc'])
+# args = parser.parse_args(['../runs/v0/south/00000/00000_WN_11_0000.asc'])
+args = parser.parse_args()
 
 forms = {'J': 'column format: signed 32-bit integer',
          'D': 'column format: 64-bit floating point',
@@ -38,11 +40,12 @@ else:
     else:
         fitsname = args.asc + '.fits'
 
-tri = {}  # TRILEGAL data
-with open(basename + '.tri', 'r') as f:
-    for line in f.readlines():
-        k, v = line.split('=')
-        tri[k.strip()] = float(v)
+# tri = {}  # TRILEGAL data
+# with open(basename + '.tri', 'r') as f:
+#     for line in f.readlines():
+#         k, v = line.split('=')
+#         tri[k.strip()] = float(v)
+tri = load_txt(basename + '.tri')
 
 tri_comments = {
     'gall': 'galactic longitude',
@@ -79,11 +82,12 @@ tri_comments = {
     'DDO51_finfmag': ''
 }
 
-atl = {}  # ATL data
-with open(basename + '.atl', 'r') as f:
-    for line in f.readlines():
-        k, v = line.split('=')
-        atl[k.strip()] = float(v)
+# atl = {}  # ATL data
+# with open(basename + '.atl', 'r') as f:
+#     for line in f.readlines():
+#         k, v = line.split('=')
+#         atl[k.strip()] = float(v)
+atl = load_txt(basename + '.atl')
 
 atl_comments = {
     'teff': '[K] effective temperature in TRILEGAL simulation',
@@ -107,7 +111,7 @@ atl_comments = {
     'Rank_Pmix': 'rank of average detection probability'
 }
 
-v = np.loadtxt(basename + '.vr')[()]
+xtras = load_txt(basename + '.xtras')
 
 history_header, history_data = mesa.load_history(folder + '/LOGS/history.data')
 profile_header, profile_data = mesa.load_profile(folder + '/final.profile.GYRE')
@@ -121,7 +125,8 @@ header['TEFF'] = (10.**history_data[-1]['log_Teff'], '[K] Effective temperature'
 header['LOGG'] = (history_data[-1]['log_g'], '[cm/s2] log10 surface gravity')
 header['SECTOR'] = (sector, 'Observing sector')
 header['RADIUS'] = (10.**history_data[-1]['log_R'], '[solar radii] stellar radius')
-header['V_R'] = (v, '[km/s] radial velocity')
+header['V_R'] = (xtras['v_r'], '[km/s] radial velocity')
+header['SIGMA_WN'] = (xtras['sigma_WN'], '[ppm] white noise level')
 
 # lightcurve data for FITS output
 

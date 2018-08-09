@@ -2,6 +2,7 @@
 
 import numpy as np
 from tomso import gyre
+from tools import save_txt, load_txt
 from argparse import ArgumentParser
 # from solioak import scaling
 from collections import OrderedDict
@@ -25,24 +26,29 @@ def logW_meta(nu, numax, Teff, a_alpha, b_alpha, c_alpha,
 
 
 parser = ArgumentParser()
-parser.add_argument('summary', type=str, help='input GYRE summary')
-parser.add_argument('atl', type=str, help='input ATL data (for galactic longitude)')
-parser.add_argument('baseout', type=str, help='basename for output files')
+# parser.add_argument('summary', type=str, help='input GYRE summary')
+# parser.add_argument('atl', type=str, help='input ATL data (for galactic longitude)')
+# parser.add_argument('baseout', type=str, help='basename for output files')
+parser.add_argument('basename', type=str, help='base string for filenames')
 parser.add_argument('--splitting', type=float, default=-1,
                     help="constant rotation splitting, ignored if < 0, "
                     "in which case rotation is taken from summary "
                     "if available, otherwise rotation = 0 (default -1)")
 parser.add_argument('--min-H', type=float, default=-1,
                     help="minimum for height H (default=-1, i.e. keep all modes)")
+
+parser.add_argument('-v', '--verbose', action='store_true')
 args = parser.parse_args()
 
-atl = {}  # ATL data
-with open(args.atl, 'r') as f:
-    for line in f.readlines():
-        k, v = line.split('=')
-        atl[k.strip()] = float(v)
+# atl = {}  # ATL data
+# with open(args.atl, 'r') as f:
+#     for line in f.readlines():
+#         k, v = line.split('=')
+#         atl[k.strip()] = float(v)
+atl = load_txt('%s.atl' % args.basename)
 
-header, summary = gyre.load_summary(args.summary)
+header, summary = gyre.load_summary('/'.join(args.basename.split('/')[:-1]) +
+                  '/gyre_summary.txt')
 
 Lsun = 3.844e33
 Rsun = 6.96568e10
@@ -60,10 +66,11 @@ numax = numax_sun*(M/R**2/(Teff/Teff_sun)**0.5)
 Dnu = Dnu_sun*np.sqrt(M/R**3)
 sig = np.sqrt(L**2/M**3/(Teff/Teff_sun)**5.5*(numax/numax_sun))*sig_sun
 
-namecon = args.baseout + '.con'
-namerot = args.baseout + '.rot'
+namecon = args.basename + '.con'
+namerot = args.basename + '.rot'
 
-np.random.seed(int(sha1((args.summary + args.atl + args.baseout).encode('utf-8')).hexdigest(), 16)%2**32)
+np.random.seed(int(sha1(('azaza' + args.basename + 'bybyb').encode('utf-8')).hexdigest(), 16)%2**32)
+warmup = np.random.randint(2**16, size=100)
 
 namelist = OrderedDict()
 namelist['user_seed'] = np.random.randint(100, 2**28-1)
@@ -84,9 +91,9 @@ namelist['p(3)'] = 0.0361707
 namelist['ass_init'] = True
 namelist['namecon'] = namecon
 namelist['namerot'] = namerot
-namelist['nameout'] = args.baseout + '.asc'
+namelist['nameout'] = args.basename + '.asc'
 
-AADG3.save_namelist(args.baseout + '.in', namelist)
+AADG3.save_namelist(args.basename + '.in', namelist)
 
 l = summary['l'].astype(int)
 n = summary['n_pg'].astype(int)
@@ -137,7 +144,15 @@ c = 299792.458
 
 nu = nu*np.sqrt((1-v/c)/(1+v/c))
 
-np.savetxt(args.baseout + '.vr', [v])
+np.savetxt(args.basename + '.vr', [v])
+
+try:
+    xtras = load_txt('%s.xtras' % args.basename)
+except FileNotFoundError:
+    xtras = {}
+
+xtras['v_r'] = v
+save_txt('%s.xtras' % args.basename, xtras)
 
 np.savetxt(namecon, np.vstack([l, n, nu, width, amp2, 0.0*nu]).T[I],
            fmt=['%2i','  %5i','  %12.7e','  %12.7e','  %12.7e','  %12.8e'])
