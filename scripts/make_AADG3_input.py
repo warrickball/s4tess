@@ -41,8 +41,8 @@ parser.add_argument('--min-H', type=float, default=-1,
 parser.add_argument('-v', '--verbose', action='store_true')
 args = parser.parse_args()
 
-basename = args.folder + '/' + args.folder.split('/')[-1]
-atl = load_txt('%s.atl' % basename)
+basename = args.folder.split('/')[-1]
+atl = load_txt(args.folder + '/%s.atl' % basename)
 
 header, summary = gyre.load_summary(args.folder + '/gyre_summary.txt')
 
@@ -65,7 +65,7 @@ sig = np.sqrt(L**2/M**3/(Teff/Teff_sun)**5.5*(numax/numax_sun))*sig_sun
 namecon = basename + '.con'
 namerot = basename + '.rot'
 
-np.random.seed(int(sha1(('azaza' + basename + 'bybyb').encode('utf-8')).hexdigest(), 16)%2**32)
+np.random.seed(int(sha1(('azaza' + args.folder + 'bybyb').encode('utf-8')).hexdigest(), 16)%2**32)
 warmup = np.random.randint(2**16, size=100)
 
 namelist = OrderedDict()
@@ -73,9 +73,9 @@ namelist['user_seed'] = np.random.randint(100, 2**28-1)
 namelist['cadence'] = 120.0
 # namelist['n_cadences'] = 13*720*137//5  # n_sectors*(cadences/day)*(days/sector=27.4d)
 if 'south' in args.folder.lower():
-    namelist['n_cadences'] = sum(tools.sector_lengths[0:13])
+    namelist['n_cadences'] = sum(sector_lengths[0:13])
 elif 'north' in args.folder.lower():
-    namelist['n_cadences'] = sum(tools.sector_lengths[13:26])
+    namelist['n_cadences'] = sum(sector_lengths[13:26])
 else:
     raise ValueError("Can't tell if star is in northern or southern hemisphere! "
                      "Expected to find either 'north' or 'south' in folder name.")
@@ -97,7 +97,7 @@ namelist['namecon'] = namecon
 namelist['namerot'] = namerot
 namelist['nameout'] = basename + '.asc'
 
-AADG3.save_namelist(basename + '.in', namelist)
+AADG3.save_namelist(args.folder + '/' + basename + '.in', namelist)
 
 l = summary['l'].astype(int)
 n = summary['n_pg'].astype(int)
@@ -148,15 +148,15 @@ c = 299792.458
 
 nu = nu*np.sqrt((1-v/c)/(1+v/c))
 
-np.savetxt(basename + '.vr', [v])
+np.savetxt(args.folder + '/' + basename + '.vr', [v])
 
 try:
-    xtras = load_txt('%s.xtras' % basename)
+    xtras = load_txt(args.folder + '/%s.xtras' % basename)
 except FileNotFoundError:
     xtras = {}
 
 xtras['v_r'] = v
-save_txt('%s.xtras' % basename, xtras)
+save_txt(args.folder + '/%s.xtras' % basename, xtras)
 
 np.savetxt(namecon, np.vstack([l, n, nu, width, amp2, 0.0*nu]).T[I],
            fmt=['%2i','  %5i','  %12.7e','  %12.7e','  %12.7e','  %12.8e'])

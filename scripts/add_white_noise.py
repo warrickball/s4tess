@@ -17,7 +17,8 @@ All files are named based on the following convention with the
 * the input light curve (without white noise) is in `basename.asc`, and
 * the output light curve (after adding white noise) is in `basename_WN.asc`.""")
 
-parser.add_argument('basename', type=str, help="base string for filenames")
+parser.add_argument('folder', type=str, help="folder containing files. "
+                    "e.g. 'south/00000'")
 # parser.add_argument('atl', type=str,
 #                     help="plain text file with ATL data")
 # parser.add_argument('tri', type=str,
@@ -97,12 +98,14 @@ def vprint(msg):
     if args.verbose:
         print(msg, end='', flush=True)
 
+basename = args.folder + '/' + args.folder.split('/')[-1]
+
 vprint('Loading TRILEGAL data... ')
-tri = load_txt('%s.tri' % args.basename)
+tri = load_txt('%s.tri' % basename)
 vprint('Done.\n')
 
 vprint('Loading ATL data... ')
-atl = load_txt('%s.atl' % args.basename)
+atl = load_txt('%s.atl' % basename)
 vprint('Done.\n')
 
 if args.model == 'stassun':
@@ -117,19 +120,19 @@ vprint('Done.\n')
     
 try:
     vprint('Loading extras data... ')
-    xtras = load_txt('%s.xtras' % args.basename)
+    xtras = load_txt('%s.xtras' % basename)
 except FileNotFoundError:
-    vprint("\nCouldn't find file `%s.xtras`.  Creating empty dict. " % args.basename)
+    vprint("\nCouldn't find file `%s.xtras`.  Creating empty dict. " % basename)
     xtras = {}
 
 vprint('Done.\nSaving white noise to extras... ')
 
 xtras['sigma_WN'] = sigma
-save_txt('%s.xtras' % args.basename, xtras)
+save_txt('%s.xtras' % basename, xtras)
 
 vprint('Done.\nAdding white noise to lightcurve... ')
     
-asc = np.loadtxt('%s.asc' % args.basename)
+asc = np.loadtxt('%s.asc' % basename)
 asc = asc + np.random.randn(len(asc))*sigma
-np.savetxt('%s_WN.asc' % args.basename, asc, fmt='%16.7f')
+np.savetxt('%s_WN.asc' % basename, asc, fmt='%16.7f')
 vprint('Done.\n')

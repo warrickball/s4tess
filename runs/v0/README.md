@@ -12,8 +12,8 @@ change.
 
 ## Get unique targets in Northern and Southern hemispheres
 
-    python3 unique.py north
-    python3 unique.py south
+    python3 ../../scripts/unique.py north
+    python3 ../../scripts/unique.py south
 
 ## Workflow
 
@@ -31,7 +31,7 @@ Skips folders in which ``final.profile.GYRE`` exists.
 
 ### Add rotation
 
-    ls north/*/final.profile.GYRE | xargs -n1 dirname | xargs -t -n1 bash add_rotation.sh
+    ls north/000*/final.profile.GYRE | xargs -n1 dirname | xargs -t -n1 bash add_rotation.sh
 
 ### Run GYRE
 
@@ -41,7 +41,7 @@ Skips folders in which ``gyre_summary.txt`` exists.
 
 ### Make AADG3 input
 
-    ls north/*/gyre_summary.txt | xargs -n1 dirname | xargs -t -n1 python3 ../../scripts/make_AADG3_input.py
+    ls north/000*/gyre_summary.txt | xargs -n1 dirname | xargs -t -n1 python3 ../../scripts/make_AADG3_input.py
 
 ### Run AADG3
 
@@ -51,19 +51,19 @@ Skips folders in which ``"$ID".asc`` exists.
 
 ### Add white noise
 
-    ls north/*/*.asc | xargs -n1 dirname | xargs -t -n1 bash add_white_noise.sh
+    ls north/000*/*.asc | xargs -n1 dirname | xargs -t -n1 python3 ../../scripts/add_white_noise.py
 
 ### Separate data into sectors
 
-    python3 sectorize.py north
+    python3 ../../scripts/sectorize.py data/sectors_north.npy -v
 
 Skips folders where ``"$ID"_WN.asc`` doesn't exist.
 
 ### Convert output to FITS
 
-    ls north/*/*_WN_*.asc | xargs -t -n1 python3 ../../scripts/asc_to_fits.py
+    ls north/000*/*_WN_*.asc | xargs -t -n1 python3 ../../scripts/asc_to_fits.py
 
 ### Save power spectra
 
-    ls north/*/*_WN_*.asc | xargs -n1 dirname | xargs -t -n1 bash save_AADG3_PS.sh
+    ls north/000*/*_WN_*.asc | xargs -n1 dirname | xargs -t -n1 bash save_AADG3_PS.sh
 
