@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
-from tools import load_txt
+from tools import load_txt, start_sectors
 from tomso import mesa
 from astropy.io import fits
 from datetime import datetime
@@ -29,8 +29,8 @@ ascname = args.asc.split('/')[-1]
 folder = '/'.join(args.asc.split('/')[:-1])
 basename = folder + '/' + args.asc.split('/')[-2]
 sector = int(ascname.split('.')[0].split('_')[2])
-# if 'north' in args.asc:
-#     sector += 13
+if 'north' in args.asc:
+    sector += 13
 
 if args.output:
     fitsname = args.output
@@ -133,7 +133,7 @@ header['SIGMA_WN'] = (xtras['sigma_WN'], '[ppm] white noise level')
 flux = np.loadtxt(args.asc)
 data = np.zeros(len(flux), dtype=[('TIME', '>f8'), ('FLUX', '>f4'), ('CADENCENO', '>i4')])
 data['FLUX'] = flux
-data['CADENCENO'] = sector*cads_per_sector + np.arange(len(flux), dtype=int)
+data['CADENCENO'] = start_sectors[sector] + np.arange(len(flux), dtype=int)
 data['TIME'] = 120.0*data['CADENCENO']/86400.0
 
 data_fits = fits.BinTableHDU(data)

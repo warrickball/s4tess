@@ -2,7 +2,7 @@
 
 import numpy as np
 from tomso import gyre
-from tools import save_txt, load_txt
+from tools import save_txt, load_txt, sector_lengths
 from argparse import ArgumentParser
 # from solioak import scaling
 from collections import OrderedDict
@@ -71,8 +71,16 @@ warmup = np.random.randint(2**16, size=100)
 namelist = OrderedDict()
 namelist['user_seed'] = np.random.randint(100, 2**28-1)
 namelist['cadence'] = 120.0
-namelist['n_cadences'] = 13*720*137//5  # n_sectors*(cadences/day)*(days/sector=27.4d)
-namelist['n_relax'] = 4320
+# namelist['n_cadences'] = 13*720*137//5  # n_sectors*(cadences/day)*(days/sector=27.4d)
+if 'south' in args.folder.lower():
+    namelist['n_cadences'] = sum(tools.sector_lengths[0:13])
+elif 'north' in args.folder.lower():
+    namelist['n_cadences'] = sum(tools.sector_lengths[13:26])
+else:
+    raise ValueError("Can't tell if star is in northern or southern hemisphere! "
+                     "Expected to find either 'north' or 'south' in folder name.")
+
+namelist['n_relax'] = 6*720
 namelist['n_fine'] = 50
 namelist['sig'] = sig
 namelist['rho'] = 0.45
