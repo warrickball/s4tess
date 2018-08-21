@@ -62,8 +62,8 @@ numax = numax_sun*(M/R**2/(Teff/Teff_sun)**0.5)
 Dnu = Dnu_sun*np.sqrt(M/R**3)
 sig = np.sqrt(L**2/M**3/(Teff/Teff_sun)**5.5*(numax/numax_sun))*sig_sun
 
-namecon = basename + '.con'
-namerot = basename + '.rot'
+modes_filename = basename + '.con'
+rotation_filename = basename + '.rot'
 
 np.random.seed(int(sha1(('azaza' + args.folder + 'bybyb').encode('utf-8')).hexdigest(), 16)%2**32)
 warmup = np.random.randint(2**16, size=100)
@@ -86,16 +86,16 @@ namelist['sig'] = sig
 namelist['rho'] = 0.45
 namelist['tau'] = 250.0/(numax/3090.)
 namelist['inclination'] = np.degrees(np.arccos(np.random.rand()))
-namelist['pcyc'] = 100.0
-namelist['phi'] = 0.0
+namelist['cycle_period'] = 100.0
+namelist['cycle_phase'] = 0.0
 namelist['nuac'] = 0.0
 namelist['p(1)'] = 1.52355
 namelist['p(2)'] = 0.565349
 namelist['p(3)'] = 0.0361707
-namelist['ass_init'] = True
-namelist['namecon'] = namecon
-namelist['namerot'] = namerot
-namelist['nameout'] = basename + '.asc'
+namelist['add_granulation'] = True
+namelist['modes_filename'] = modes_filename
+namelist['rotation_filename'] = rotation_filename
+namelist['output_filename'] = basename + '.asc'
 
 AADG3.save_namelist(args.folder + '/' + basename + '.in', namelist)
 
@@ -158,7 +158,8 @@ except FileNotFoundError:
 xtras['v_r'] = v
 save_txt(args.folder + '/%s.xtras' % basename, xtras)
 
-np.savetxt(namecon, np.vstack([l, n, nu, width, amp2, 0.0*nu]).T[I],
+np.savetxt(args.folder + '/' + modes_filename, 
+           np.vstack([l, n, nu, width, amp2, 0.0*nu]).T[I],
            fmt=['%2i','  %5i','  %12.7e','  %12.7e','  %12.7e','  %12.8e'])
 
 if args.splitting >= 0:
@@ -170,7 +171,7 @@ else:
         dnu_rot = np.zeros_like(nu)
         
 
-with open(namerot, 'w') as f:
+with open(args.folder + '/' + rotation_filename, 'w') as f:
     for ni, li, dnu_roti in zip(n[I], l[I], dnu_rot[I]):
         for m in range(1, li+1):
             f.write('%5i%3i%3i%12.7f\n' % (ni, li, m, dnu_roti))
