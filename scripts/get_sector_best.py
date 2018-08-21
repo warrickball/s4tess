@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import numpy as np
+from tools import tess_sectors
 from argparse import ArgumentParser
 
 def tess_fields_vector(lon, lat):
@@ -37,26 +38,29 @@ parser.add_argument('-N', '--Ntargets', type=int, default=1000,
                     help="number of targets per sector (default=1000)")
 parser.add_argument('-v', '--verbose', action='store_true')
 parser.add_argument('--start-lon', type=float, default=315.8,
-                    help="ecliptic longitude of first observing sector, "
-                    "in degrees (default=315.8)")
+                    # help="ecliptic longitude of first observing sector, "
+                    # "in degrees (default=315.8)")
+                    help="ecliptic longitude offset of the first observing sector, "
+                    "in degrees (default=0)")
 args = parser.parse_args()
+
+def vprint(*print_args, **print_kwargs):
+    if args.verbose:
+        print(*print_args, **print_kwargs)
 
 Nsectors = 26  # 13 North, 13 South
 
 I = [[] for i in range(Nsectors)]
 
-if args.verbose:
-    print('Loading data from %s...' % args.source)
+vprint('Loading data from %s...' % args.source)
 data = np.load(args.source)
 
-if args.verbose:
-    print('Selecting best stars in each sector...')
+vprint('Selecting best stars in each sector...')
     
 for i, row in enumerate(data):
-    
     sectors_N = np.hstack([
-        tess_fields_vector(row['ELon']-args.start_lon, row['ELat'])[0],
-        tess_fields_vector(row['ELon']-args.start_lon, -row['ELat'])[0]
+        tess_fields_vector(row['ELon'] - args.start_lon, row['ELat'])[0],
+        tess_fields_vector(row['ELon'] - args.start_lon, -row['ELat'])[0]
     ])
     
     for j, sector in enumerate(sectors_N):
@@ -65,11 +69,9 @@ for i, row in enumerate(data):
 
     if np.all([len(i) >= args.Ntargets for i in I]): break
 
-if args.verbose:
-    print('Saving output...')
+vprint('Saving output...')
         
 for j, i in enumerate(I):
     np.save(args.output.format(j), data[i])
 
-if args.verbose:
-    print('Done.')
+vprint('Done.')
