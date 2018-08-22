@@ -17,6 +17,8 @@ parser.add_argument('-o', '--output', type=str, default=None,
                     "with `.asc` replaced with `.fits`.  If the input filename "
                     "doesn't end with `.asc`, the output file is just the input "
                     "filename with `.fits` appended.")
+parser.add_argument('--skip-test', action='store_true',
+                    help="don't test the FITS file after it's written")
 # args = parser.parse_args(['../runs/v0/south/00000/00000_WN_11_0000.asc'])
 args = parser.parse_args()
 
@@ -29,8 +31,6 @@ ascname = args.asc.split('/')[-1]
 folder = '/'.join(args.asc.split('/')[:-1])
 basename = folder + '/' + args.asc.split('/')[-2]
 sector = int(ascname.split('.')[0].split('_')[2])
-if 'north' in args.asc:
-    sector += 13
 
 if args.output:
     fitsname = args.output
@@ -45,14 +45,14 @@ else:
 #     for line in f.readlines():
 #         k, v = line.split('=')
 #         tri[k.strip()] = float(v)
-tri = load_txt(basename + '.tri')
+meta = load_txt(basename + '.meta')
 
-tri_comments = {
+meta_comments = {
     'gall': 'galactic longitude',
     'galb': 'galactic latitude',
     'Gc': 'galactic component: 1--4 = thin disc, thick disc, halo, bulge',
     'logAge': '[yr] log10 age',
-    'M_H': '',
+    'M_H': 'metallicity',
     'm_ini': '[solar masses] initial stellar mass',
     'mu0': 'distance modulus',
     'Av': 'reddening',
@@ -70,26 +70,16 @@ tri_comments = {
     'pspaci': '',
     'pcoupl': '',
     'mbolmag': '',
-    'TESSmag': '',
+    'TESSmag': 'TESS magnitude',
     'Jmag': '',
     'Hmag': '',
     'Ksmag': '',
-    'Keplermag': '',
-    'gmag': '',
-    'rmag': '',
-    'imag': '',
-    'zmag': '',
-    'DDO51_finfmag': ''
-}
-
-# atl = {}  # ATL data
-# with open(basename + '.atl', 'r') as f:
-#     for line in f.readlines():
-#         k, v = line.split('=')
-#         atl[k.strip()] = float(v)
-atl = load_txt(basename + '.atl')
-
-atl_comments = {
+    'Keplermag': 'Kepler magnitude',
+    'gmag': 'g-band magnitude',
+    'rmag': 'r-band magnitude',
+    'imag': 'i-band magnitude',
+    'zmag': 'z-band magnitude',
+    'DDO51_finfmag': '',
     'teff': '[K] effective temperature in TRILEGAL simulation',
     'rad': '[solar radii] stellar radius',
     'Lum': '[solar luminosities] stellar luminosity',
@@ -101,7 +91,6 @@ atl_comments = {
     'ELat': '[degrees] ecliptic latitude',
     'tred': '',
     'region': '',
-    'numax': '[uHz] frequency of maximum oscillation power',
     'max_T': '',
     'Pdet_fixedBeta': 'detection probability',
     'SNR_fixedBeta': 'signal-to-noise ratio',
@@ -110,8 +99,6 @@ atl_comments = {
     'P_mix': 'average detection probability',
     'Rank_Pmix': 'rank of average detection probability'
 }
-
-xtras = load_txt(basename + '.xtras')
 
 history_header, history_data = mesa.load_history(folder + '/LOGS/history.data')
 profile_header, profile_data = mesa.load_profile(folder + '/final.profile.GYRE')
@@ -123,10 +110,22 @@ header['ORIGIN'] = ('Uni. Birmingham', 'institution responsible for creating thi
 header['DATE'] = (datetime.today().strftime('%Y-%m-%d'), 'file creation date')
 header['TEFF'] = (10.**history_data[-1]['log_Teff'], '[K] Effective temperature')
 header['LOGG'] = (history_data[-1]['log_g'], '[cm/s2] log10 surface gravity')
-header['SECTOR'] = (sector, 'Observing sector')
 header['RADIUS'] = (10.**history_data[-1]['log_R'], '[solar radii] stellar radius')
-header['V_R'] = (xtras['v_r'], '[km/s] radial velocity')
-header['SIGMA_WN'] = (xtras['sigma_WN'], '[ppm] white noise level')
+header['LUM'] = (10.**history_data[-1]['log_L'], '[solar luminosities] stellar luminosity')
+header['AGE'] = (history_data[-1]['star_age']/1e9, '[Gyr] stellar age')
+header['SECTOR'] = (sector, 'Observing sector')
+header['VR'] = (meta['vr'], '[km/s] radial velocity')
+header['SIGMA'] = (meta['sigma'], '[ppm] white noise level')
+header['ELON'] = (meta['ELon'], '[degrees] ecliptic longitude')
+header['ELAT'] = (meta['ELat'], '[degrees] ecliptic latitude')
+header['GLON'] = (meta['gall'], '[degrees] galactic longitude')
+header['GLAT'] = (meta['galb'], '[degrees] galactic latitude')
+header['GC'] = (int(meta['Gc']), 'gal. comp.: 1-4 = thin/thick disc, halo, bulge')
+header['COMP'] = (int(meta['comp']), 'binarity: 0-2 = single, primary, secondary')
+header['PMIX'] = (meta['P_mix'], 'average detection probability')
+header['TOT_RANK'] = (int(meta['Rank_Pmix']), 'rank across the whole sample')
+header['MU0'] = (meta['mu0'], 'distance modulus')
+header['AV'] = (meta['Av'], 'interstellar reddening')
 
 # lightcurve data for FITS output
 
@@ -147,20 +146,6 @@ for i in range(1, 1 + data_fits.header['TFIELDS']):
     k = 'TFORM%i' % i
     form = data_fits.header[k]
     data_fits.header[k] = (form, forms[form])
-
-# ATL data for FITS ouptut
-
-atl_fits = {k: (atl[k], atl_comments[k]) for k in atl.keys()}
-atl_fits = fits.Header()
-for k in atl.keys():
-    atl_fits[k] = (atl[k], atl_comments[k])
-    
-# TRILEGAL data for FITS ouptut
-    
-tri_fits = {k: (tri[k], tri_comments[k]) for k in tri.keys()}
-tri_fits = fits.Header()
-for k in tri.keys():
-    tri_fits[k] = (tri[k], tri_comments[k])
 
 # mode data for FITS ouptut
     
@@ -188,11 +173,12 @@ for i in range(1, 1 + modes_fits.header['TFIELDS']):
     modes_fits.header[k] = (form, forms[form])
 
 hdul = fits.HDUList([fits.PrimaryHDU(header=header), data_fits,
-                     fits.TableHDU(header=atl_fits, name='ATL'),
-                     fits.TableHDU(header=tri_fits, name='TRILEGAL'),
+                     # fits.TableHDU(header=atl_fits, name='ATL'),
+                     # fits.TableHDU(header=tri_fits, name='TRILEGAL'),
                      modes_fits])
 hdul.writeto(fitsname, overwrite=True)
 
-test = fits.open(fitsname)
-print(test[0].header)
-# test.close()
+if not args.skip_test:
+    test = fits.open(fitsname)
+    # print(test[0].header)
+    test.close()
