@@ -7,61 +7,68 @@ for subsequent steps is always available.  These steps shoudn't
 change.
 
     mkdir data
-    python3 ../../scripts/get_sector_best.py ../../data/atl.npy data/atl_v0_{:02d}.npy -N 1000 -v
-    seq -w 00 25 | xargs -t -I{} python3 ../../scripts/cross_match_trilegal_atl.py ../../data/tri.npy data/atl_v0_{}.npy -o data/tri_v0_{}.npy -v
-
-## Get unique targets in Northern and Southern hemispheres
-
-    python3 ../../scripts/unique.py north
-    python3 ../../scripts/unique.py south
+    python3 ../../scripts/get_metadata.py ../../data/atl.npy ../../data/tri.npy data/meta.npy -v -N 1000
 
 ## Workflow
 
-In this example, we do the first 100 models in the Northern hemisphere.
+In this example, we do the first 20 models.
 
-### Make main folders with MESA input
+### Make folders
 
-    bash make_MESA_input.sh north 00000 00099
+    mkdir new
+    seq -w 0 00019 | xargs -I{} -t cp -r ../../template/ new/{}
+
+### Export metadata
+
+    python3 ../../scripts/export_metadata.py data/meta.npy "new/#/#.meta" -N 20 -v --fmt {:05d}
+
+### Make MESA input
+
+    seq -w 0 00019 | xargs -t -I{} python3 ../../scripts/make_MESA_input.py new/{}/{}.meta --Tc ../../data/Tc.dat
+
+or
+
+    ls new/*/*.meta | xargs -t -I{} python3 ../../scripts/make_MESA_input.py {} --Tc ../../data/Tc.dat
 
 ### Run MESA
 
-    sbatch --export=SECTOR="north" --array=0-99 MESA_sector_array.slurm
+    sbatch --export=SECTOR="new" --array=0-19 MESA_sector_array.slurm
 
 Skips folders in which ``final.profile.GYRE`` exists.
 
 ### Add rotation
 
-    ls north/000*/final.profile.GYRE | xargs -n1 dirname | xargs -t -n1 bash add_rotation.sh
+    seq -w 0 00019 | xargs -t -I{} bash add_rotation.sh new/{}
 
 ### Run GYRE
 
-    sbatch --export=SECTOR="north" --array=0-99 GYRE_sector_array.slurm
+    sbatch --export=SECTOR="new" --array=0-19 GYRE_sector_array.slurm
 
 Skips folders in which ``gyre_summary.txt`` exists.
 
 ### Make AADG3 input
 
-    ls north/000*/gyre_summary.txt | xargs -n1 dirname | xargs -t -n1 python3 ../../scripts/make_AADG3_input.py
+    seq -w 0 00019 | xargs -t -I{} python3 ../../scripts/make_AADG3_input.py new/{}
 
 ### Run AADG3
 
-    sbatch --export=SECTOR="north" --array=0-99 AADG3_sector_array.slurm
+    sbatch --export=SECTOR="new" --array=0-19 AADG3_sector_array.slurm
 
 Skips folders in which ``"$ID".asc`` exists.
 
 ### Add white noise
 
-    ls north/000*/*.asc | xargs -n1 dirname | xargs -t -n1 python3 ../../scripts/add_white_noise.py
+    seq -w 0 00019 | xargs -t -I{} python3 ../../scripts/add_white_noise.py new/{}
 
 ### Separate data into sectors
 
-    python3 ../../scripts/sectorize.py data/sectors_north.npy -v
+    seq -w 0 00019 | xargs -t -I{} python3 ../../scripts/sectorize.py new/{}
 
 Skips folders where ``"$ID"_WN.asc`` doesn't exist.
 
 ### Convert output to FITS
 
-    ls north/000*/*_WN_*.asc | xargs -t -n1 python3 ../../scripts/asc_to_fits.py
+    ls new/000[01][0-9]/*_WN_*.asc | xargs -t -n1 python3 ../../scripts/asc_to_fits.py
 
 ### Save power spectra
 
