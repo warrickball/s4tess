@@ -100,39 +100,13 @@ def vprint(msg):
 
 basename = args.folder + '/' + args.folder.split('/')[-1]
 
-vprint('Loading TRILEGAL data... ')
-tri = load_txt('%s.tri' % basename)
+vprint('Loading metadata... ')
+meta = load_txt('%s.meta' % basename)
 vprint('Done.\n')
-
-vprint('Loading ATL data... ')
-atl = load_txt('%s.atl' % basename)
-vprint('Done.\n')
-
-if args.model == 'stassun':
-    vprint('Computing white noise using `stassun`... ')
-    sigma = stassun(tri['imag'])
-elif args.model == 'schofield':
-    vprint('Computing white noise using `schofield`... ')
-    sigma = schofield(tri['imag'], atl['teff'], atl['ELon'],
-                      atl['ELat'], atl['GLon'], atl['GLat'])
-
-vprint('Done.\n')
-    
-try:
-    vprint('Loading extras data... ')
-    xtras = load_txt('%s.xtras' % basename)
-except FileNotFoundError:
-    vprint("\nCouldn't find file `%s.xtras`.  Creating empty dict. " % basename)
-    xtras = {}
-
-vprint('Done.\nSaving white noise to extras... ')
-
-xtras['sigma_WN'] = sigma
-save_txt('%s.xtras' % basename, xtras)
 
 vprint('Done.\nAdding white noise to lightcurve... ')
     
 asc = np.loadtxt('%s.asc' % basename)
-asc = asc + np.random.randn(len(asc))*sigma
+asc = asc + np.random.randn(len(asc))*meta['sigma']
 np.savetxt('%s_WN.asc' % basename, asc, fmt='%16.7f')
 vprint('Done.\n')

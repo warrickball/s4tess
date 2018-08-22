@@ -42,7 +42,7 @@ parser.add_argument('-v', '--verbose', action='store_true')
 args = parser.parse_args()
 
 basename = args.folder.split('/')[-1]
-atl = load_txt(args.folder + '/%s.atl' % basename)
+meta = load_txt(args.folder + '/%s.meta' % basename)
 
 header, summary = gyre.load_summary(args.folder + '/gyre_summary.txt')
 
@@ -72,9 +72,11 @@ namelist = OrderedDict()
 namelist['user_seed'] = np.random.randint(100, 2**28-1)
 namelist['cadence'] = 120.0
 # namelist['n_cadences'] = 13*720*137//5  # n_sectors*(cadences/day)*(days/sector=27.4d)
-if 'south' in args.folder.lower():
+# if 'south' in args.folder.lower():
+if np.any([meta['rank_%02i' % i] > -1 for i in range(0, 13)]):
     namelist['n_cadences'] = sum(sector_lengths[0:13])
-elif 'north' in args.folder.lower():
+# elif 'north' in args.folder.lower():
+elif np.any([meta['rank_%02i' % i] > -1 for i in range(13, 26)]):
     namelist['n_cadences'] = sum(sector_lengths[13:26])
 else:
     raise ValueError("Can't tell if star is in northern or southern hemisphere! "
@@ -139,24 +141,10 @@ TAU = 2*np.pi
 def func(x, a0, a1, p1, a2, p2):
     return a0 + a1*np.sin(TAU*(x/360.0 + p1)) + a2*np.sin(TAU*(x/180.0 + p2))
 
-p = [1.37622546, 18.8420428, 0.577075134, 7.93274147, -0.0148034692]
-mean_v = func(atl['GLon'], *p)
-p = [30.01595341, -1.1142313, 0.72453242, 4.34319137, 0.19605259]
-sigma_v = func(atl['GLon'], *p)
-v = mean_v + sigma_v*np.random.randn()
+v = meta['vr']
 c = 299792.458
 
 nu = nu*np.sqrt((1-v/c)/(1+v/c))
-
-np.savetxt(args.folder + '/' + basename + '.vr', [v])
-
-try:
-    xtras = load_txt(args.folder + '/%s.xtras' % basename)
-except FileNotFoundError:
-    xtras = {}
-
-xtras['v_r'] = v
-save_txt(args.folder + '/%s.xtras' % basename, xtras)
 
 np.savetxt(args.folder + '/' + modes_filename, 
            np.vstack([l, n, nu, width, amp2, 0.0*nu]).T[I],
