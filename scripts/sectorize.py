@@ -29,7 +29,10 @@ for sector, rank in enumerate(ranks):
     if rank < 0:
         continue
     else:
+        hemi = sector//13*13
         start, end = sector_starts[sector:sector+2]
+        start -= sector_starts[hemi]
+        end -= sector_starts[hemi]
         with open('%s/%s_WN_%02i_%04i.asc'
                   % (args.folder, basename, sector, rank), 'w') as f:
             f.writelines(lines[start:end])

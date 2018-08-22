@@ -89,7 +89,7 @@ vprint('Done.\n')
 
 I = np.where(np.any(ranks >= 0, axis=1))[0]
 
-vprint('White noise model is `%s`.' % args.noise_model)
+vprint('White noise model is `%s`.\n' % args.noise_model)
 vprint('Combining datasets... ')
 dtype = [('gall', float), ('galb', float), ('Gc', int), ('logAge', float),
          ('logTe', float), ('logL', float),
