@@ -44,6 +44,6 @@ except IndexError:
 
 for i, row in enumerate(meta[start:end]):
     vprint('\rProcessing star %i of %i... ' % (i+1, end-start))
-    save_txt(args.filename.replace(args.placeholder, args.fmt.format(i)), np.array(row))
+    save_txt(args.filename.replace(args.placeholder, args.fmt.format(start + i)), np.array(row))
 
 vprint('Done.\n')
