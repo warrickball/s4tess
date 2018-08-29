@@ -11,21 +11,26 @@ def one_line(name, x, y, expx=False, expy=False):
         name, xx, yy, xx-yy, xx/yy-1.))
 
 parser = ArgumentParser(description=
-"""Cross check MESA output against data in TRILEGAL files.""")
-parser.add_argument('history', type=str, help="MESA history file")
-parser.add_argument('tri', type=str, help="TRILEGAL data file")
+"""Cross check MESA output against data in TRILEGAL output.""")
+parser.add_argument('folders', type=str, nargs='+',
+                    help="folders containing results")
 args = parser.parse_args()
 
-header, history = mesa.load_history(args.history)
+for folder in args.folders:
+    basename = folder.split('/')[-1]
 
-with open(args.tri, 'r') as f:
-    lines = [line.strip().split(' = ') for line in f.readlines()]
-    tri = {line[0]: float(line[1]) for line in lines}
+    header, history = mesa.load_history(folder + '/LOGS/history.data')
 
-columns = ['#           ', 'TRILEGAL', 'MESA', 'diff', 'frac diff']
-header_fmt = '{:>12s}'*len(columns)
-print(header_fmt.format(*columns))
+    with open('%s/%s.meta' % (folder, basename), 'r') as f:
+        lines = [line.strip().split(' = ') for line in f.readlines()]
+        meta = {line[0]: float(line[1]) for line in lines}
 
-one_line('Teff/K', tri['logTe'], history[-1]['log_Teff'], expx=True, expy=True)
-one_line('log(L/Lsun)', tri['logL'], history[-1]['log_L'])
-one_line('age/Gyr', tri['logAge']-9.0, history[-1]['star_age']/1e9, expx=True)
+    columns = ['#           ', 'TRILEGAL', 'MESA', 'diff', 'frac diff']
+    header_fmt = '{:>12s}'*len(columns)
+    print(header_fmt.format(*columns))
+
+    one_line('Teff/K', meta['logTe'], history[-1]['log_Teff'], expx=True, expy=True)
+    one_line('log(L/Lsun)', meta['logL'], history[-1]['log_L'])
+    one_line('age/Gyr', meta['logAge']-9.0, history[-1]['star_age']/1e9, expx=True)
+
+    print()
