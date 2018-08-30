@@ -43,7 +43,7 @@
 	freq_max = 0.95
 	freq_min_units = 'ACOUSTIC_CUTOFF'
 	freq_max_units = 'ACOUSTIC_CUTOFF'
-	n_freq = 400
+	n_freq = 800
 /
 
 &scan
@@ -52,7 +52,7 @@
 	freq_max = 0.95
 	freq_min_units = 'ACOUSTIC_CUTOFF'
 	freq_max_units = 'ACOUSTIC_CUTOFF'
-	n_freq = 800
+	n_freq = 1000
 	tag_list = 'l=1'
 /
 
@@ -62,7 +62,7 @@
 	freq_max = 0.95
 	freq_min_units = 'ACOUSTIC_CUTOFF'
 	freq_max_units = 'ACOUSTIC_CUTOFF'
-	n_freq = 1500
+	n_freq = 3000
 	tag_list = 'l=2'
 /
 
@@ -72,7 +72,7 @@
 	freq_max = 0.95
 	freq_min_units = 'ACOUSTIC_CUTOFF'
 	freq_max_units = 'ACOUSTIC_CUTOFF'
-	n_freq = 2000
+	n_freq = 10000
 	tag_list = 'l=3'
 /
 
@@ -86,7 +86,10 @@
 	freq_units = 'UHZ'
 	summary_file = 'gyre_summary.txt'
 	summary_file_format = 'TXT'
-	summary_item_list = 'M_star,R_star,L_star,l,n_pg,n_p,n_g,freq,E_norm,dfreq_rot'
+ 	summary_item_list = 'M_star,R_star,L_star,l,n_pg,n_p,n_g,freq,E_norm,dfreq_rot'
+  	! mode_file_format = 'TXT'
+  	! mode_template = 'mode_%J.txt'
+  	! mode_item_list = 'l,n_pg,n_p,n_g,freq,E_norm,dfreq_rot,x,xi_r,xi_h,prop_type'
 /
 
 &nad_output
