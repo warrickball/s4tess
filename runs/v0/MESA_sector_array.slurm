@@ -28,6 +28,10 @@ then
     exit 1
 fi
 
+if ! [ -L star ]
+then
+    ln -s /rds/projects/2017/ballwh-stellar-modelling/s4tess/mesa_work/star
+fi
 
 # if MESA log exists, then see which try we were on, and retry
 # otherwise, this is the first try
