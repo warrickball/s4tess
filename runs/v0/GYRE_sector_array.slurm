@@ -7,7 +7,7 @@
 #SBATCH --nodes 1
 #SBATCH --tasks 1
 #SBATCH --mem 1G
-#SBATCH --time 00:15:00
+#SBATCH --time 00:30:00
 #SBATCH --output slurm/GYRE_sector_array_%A_%a.out
 #SBATCH --error slurm/GYRE_sector_array_%A_%a.err
 
