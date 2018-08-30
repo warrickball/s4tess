@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
+import AADG3
 from tools import load_txt, sector_starts
 from tomso import mesa
 from astropy.io import fits
@@ -101,31 +102,54 @@ meta_comments = {
 }
 
 history_header, history_data = mesa.load_history(folder + '/LOGS/history.data')
-profile_header, profile_data = mesa.load_profile(folder + '/final.profile.GYRE')
+profile_header, profile_data = mesa.load_profile(folder + '/final.profile')
+
+nml = AADG3.load_namelist(basename + '.in')
 
 # header data for FITS output
     
 header = fits.Header()
 header['ORIGIN'] = ('Uni. Birmingham', 'institution responsible for creating this file')
 header['DATE'] = (datetime.today().strftime('%Y-%m-%d'), 'file creation date')
+header['MASS'] = (history_data[-1]['star_mass'], '[solar masses] stellar mass')
+header['RADIUS'] = (10.**history_data[-1]['log_R'], '[solar radii] stellar radius')
+header['AGE'] = (history_data[-1]['star_age']/1e9, '[Gyr] stellar age')
 header['TEFF'] = (10.**history_data[-1]['log_Teff'], '[K] Effective temperature')
 header['LOGG'] = (history_data[-1]['log_g'], '[cm/s2] log10 surface gravity')
-header['RADIUS'] = (10.**history_data[-1]['log_R'], '[solar radii] stellar radius')
 header['LUM'] = (10.**history_data[-1]['log_L'], '[solar luminosities] stellar luminosity')
-header['AGE'] = (history_data[-1]['star_age']/1e9, '[Gyr] stellar age')
-header['SECTOR'] = (sector, 'Observing sector')
+header['X_C'] = (profile_data[-1]['x'], 'central hydrogen abundance')
+header['Y_C'] = (profile_data[-1]['y'], 'central helium abundance')
+header['Z_INI'] = (history_header['initial_z'][()], 'initial metal abundance')
+
+Zsun = 0.01756
+Ysun = 0.26618
+Xsun = 1.0 - Zsun - Ysun
+dq = 10.**profile_data['logdq']
+I = (profile_data['q'] > 0.9999)
+FeH = np.log10(np.sum(profile_data['z'][I]*dq[I])/np.sum(profile_data['x'][I]*dq[I])/(Zsun/Xsun))
+
+header['FE_H'] = (FeH, 'final metallicity [Fe/H]')
+
 header['VR'] = (meta['vr'], '[km/s] radial velocity')
-header['SIGMA'] = (meta['sigma'], '[ppm] white noise level')
+header['MU0'] = (meta['mu0'], 'distance modulus')
+header['AV'] = (meta['Av'], 'interstellar reddening')
+
+header['SECTOR'] = (sector, 'Observing sector')
 header['ELON'] = (meta['ELon'], '[degrees] ecliptic longitude')
 header['ELAT'] = (meta['ELat'], '[degrees] ecliptic latitude')
 header['GLON'] = (meta['gall'], '[degrees] galactic longitude')
 header['GLAT'] = (meta['galb'], '[degrees] galactic latitude')
 header['GC'] = (int(meta['Gc']), 'gal. comp.: 1-4 = thin/thick disc, halo, bulge')
 header['COMP'] = (int(meta['comp']), 'binarity: 0-2 = single, primary, secondary')
-header['PMIX'] = (meta['P_mix'], 'average detection probability')
+header['PMIX'] = (meta['P_mix'], 'detection probability')
 header['TOT_RANK'] = (int(meta['Rank_Pmix']), 'rank across the whole sample')
-header['MU0'] = (meta['mu0'], 'distance modulus')
-header['AV'] = (meta['Av'], 'interstellar reddening')
+header['SIGMA'] = (meta['sigma'], '[ppm] white noise amplitude')
+
+header['SEED'] = (nml['user_seed'], 'seed for random number generator')
+header['N_CADS'] = (nml['n_cadences'], 'number of cadences in hemisphere')
+header['GRAN_SIG'] = (nml['sig'], '[ppm] granulation amplitude')
+header['GRAN_TAU'] = (nml['tau'], '[s] granulationtimescale')
+header['INC'] = (nml['inclination'], '[degrees] inclination')
 
 # lightcurve data for FITS output
 
@@ -139,7 +163,7 @@ data_fits = fits.BinTableHDU(data)
 data_fits.header['TTYPE1'] = (data_fits.header['TTYPE1'], 'column title: data timestamp')
 data_fits.header['TUNIT1'] = ('d', 'column unit: days')
 data_fits.header['TTYPE2'] = (data_fits.header['TTYPE2'], 'column title: intensity variation')
-data_fits.header['TUNIT2'] = ('', '')
+data_fits.header['TUNIT2'] = ('ppm', 'column unit: parts per million')
 data_fits.header['TTYPE3'] = (data_fits.header['TTYPE3'], 'column title: cadence number')
 
 for i in range(1, 1 + data_fits.header['TFIELDS']):
@@ -150,11 +174,11 @@ for i in range(1, 1 + data_fits.header['TFIELDS']):
 # mode data for FITS ouptut
     
 modes = np.loadtxt(basename + '.con',
-                   dtype=[('l', '>i4'), ('n', '>i4'), ('nu', '>f8'),
-                          ('width', '>f8'), ('amp2', '>f8'), ('rot', '>f8')])
+                   dtype=[('L', '>i4'), ('N', '>i4'), ('FREQ', '>f8'),
+                          ('WIDTH', '>f8'), ('POWER', '>f8'), ('ROT', '>f8')])
 
 rot = np.genfromtxt(basename + '.rot', names=['n', 'l', 'm', 'dnu'])
-modes['rot'][modes['l']>0] = rot[rot['m']==1]['dnu']
+modes['ROT'][modes['L']>0] = rot[rot['m']==1]['dnu']
 
 modes_fits = fits.BinTableHDU(modes)
 modes_fits.header['TTYPE1'] = (modes_fits.header['TTYPE1'], 'column title: angular degree')
@@ -164,6 +188,7 @@ modes_fits.header['TUNIT3'] = ('uHz', 'column units: microhertz')
 modes_fits.header['TTYPE4'] = (modes_fits.header['TTYPE4'], 'column title: linewidth')
 modes_fits.header['TUNIT4'] = ('uHz', 'column units: microhertz')
 modes_fits.header['TTYPE5'] = (modes_fits.header['TTYPE5'], 'column title: mode power')
+modes_fits.header['TUNIT5'] = ('ppm2', 'column units: parts per million squared')
 modes_fits.header['TTYPE6'] = (modes_fits.header['TTYPE6'], 'column title: rotational splitting')
 modes_fits.header['TUNIT6'] = ('uHz', 'column units: microhertz')
 
