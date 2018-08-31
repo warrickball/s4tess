@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# when using this command, you must export the SECTOR variable
+# when using this command, you must export the RUN variable
 # and specify the array range
-# e.g. sbatch --export=SECTOR="north" --array=0-99 GYRE_sector_array.slurm
+# e.g. sbatch --export=RUN="alpha" --array=0-99 GYRE_sector_array.slurm
 
 #SBATCH --nodes 1
 #SBATCH --tasks 1
@@ -15,10 +15,10 @@ module purge; module load bluebear  # this line is required
 
 export OMP_NUM_THREADS=1
 echo OMP_NUM_THREADS $OMP_NUM_THREADS
-echo $SECTOR
+echo $RUN
 export GYRE_DIR=/rds/homes/b/ballwh/code/gyre/fork
 ID=$(printf "%05d" $SLURM_ARRAY_TASK_ID)
-cd $SLURM_SUBMIT_DIR/$SECTOR/$ID
+cd $SLURM_SUBMIT_DIR/$RUN/$ID
 pwd
 if [ -f gyre_summary.txt ]
 then

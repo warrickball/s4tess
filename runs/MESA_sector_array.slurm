@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# when using this command, you must export the SECTOR variable
+# when using this command, you must export the RUN variable
 # and specify the array range
-# e.g. sbatch --export=SECTOR="north" --array=0-99 MESA_sector_array.slurm
+# e.g. sbatch --export=RUN="alpha" --array=0-99 MESA_sector_array.slurm
 
 #SBATCH --nodes 1
 #SBATCH --tasks 1
@@ -17,9 +17,9 @@ module load scipy/0.19.0-python-3.5.2
 
 export OMP_NUM_THREADS=2
 echo OMP_NUM_THREADS $OMP_NUM_THREADS
-echo $SECTOR
+echo $RUN
 export MESA_DIR=/rds/projects/2017/ballwh-stellar-modelling/mesa/7385
-cd $SLURM_SUBMIT_DIR/$SECTOR/$(printf "%05d" $SLURM_ARRAY_TASK_ID)
+cd $SLURM_SUBMIT_DIR/$RUN/$(printf "%05d" $SLURM_ARRAY_TASK_ID)
 pwd
 if [ -f final.profile.GYRE ]
 then

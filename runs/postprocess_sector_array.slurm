@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# when using this command, you must export the SECTOR variable
+# when using this command, you must export the RUN variable
 # and specify the array range
-# e.g. sbatch --export=SECTOR="north" --array=0-99 AADG3_sector_array.slurm
+# e.g. sbatch --export=RUN="alpha" --array=0-99 AADG3_sector_array.slurm
 
 #SBATCH --nodes 1
 #SBATCH --tasks 1
@@ -16,9 +16,9 @@
 module purge; module load bluebear  # this line is required
 module load scipy/0.19.0-python-3.5.2
 
-echo $SECTOR
+echo $RUN
 ID=$(printf "%05d" $SLURM_ARRAY_TASK_ID)
 cd $SLURM_SUBMIT_DIR
-python3 ../scripts/add_white_noise.py $SECTOR/$ID
-python3 ../scripts/sectorize.py $SECTOR/$ID
-ls $SECTOR/$ID/"$ID"_WN_*.asc | xargs -t -n1 python3 ../scripts/asc_to_fits.py
+python3 ../scripts/add_white_noise.py $RUN/$ID
+python3 ../scripts/sectorize.py $RUN/$ID
+ls $RUN/$ID/"$ID"_WN_*.asc | xargs -t -n1 python3 ../scripts/asc_to_fits.py
