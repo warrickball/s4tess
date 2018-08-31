@@ -10,7 +10,7 @@ fi
 
 NSECTORS=$(seq $1 $2 | wc -l)
 NSTARS=$3
-TOP=../..
+TOP=..
 
 for SECTOR in $(seq -w $1 $2)
 do

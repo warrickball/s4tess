@@ -6,5 +6,5 @@ OLDPWD=$(pwd)
 # BASENAME=$(echo $1 | sed 's:/:_:g')
 BASENAME=$(basename $1)
 cd $1
-python3 ../../../../scripts/add_white_noise.py $BASENAME.atl $BASENAME.tri $BASENAME.asc "$BASENAME"_WN.asc
+python3 ../../../scripts/add_white_noise.py $BASENAME.atl $BASENAME.tri $BASENAME.asc "$BASENAME"_WN.asc
 cd $OLDPWD

@@ -19,6 +19,6 @@ module load scipy/0.19.0-python-3.5.2
 echo $SECTOR
 ID=$(printf "%05d" $SLURM_ARRAY_TASK_ID)
 cd $SLURM_SUBMIT_DIR
-python3 ../../scripts/add_white_noise.py $SECTOR/$ID
-python3 ../../scripts/sectorize.py $SECTOR/$ID
-ls $SECTOR/$ID/"$ID"_WN_*.asc | xargs -t -n1 python3 ../../scripts/asc_to_fits.py
+python3 ../scripts/add_white_noise.py $SECTOR/$ID
+python3 ../scripts/sectorize.py $SECTOR/$ID
+ls $SECTOR/$ID/"$ID"_WN_*.asc | xargs -t -n1 python3 ../scripts/asc_to_fits.py

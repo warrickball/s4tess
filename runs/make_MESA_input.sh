@@ -9,7 +9,7 @@ then
     exit 1
 fi
 
-TOP=../..
+TOP=..
 
 for STAR in $(seq -w $2 $3)
 do

@@ -8,5 +8,5 @@ DIRNAME=$(dirname $1)
 FILENAME=$(basename $1 .asc)
 ID=$(basename $DIRNAME)
 cd $DIRNAME
-python3 ../../../../scripts/save_AADG3_PS.py "$ID".in "$FILENAME".pow --nameout "$FILENAME".asc
+python3 ../../../scripts/save_AADG3_PS.py "$ID".in "$FILENAME".pow --nameout "$FILENAME".asc
 cd $OLDPWD

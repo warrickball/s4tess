@@ -49,7 +49,7 @@ echo TRY $TRIES > mesa.log
 # while grep --quiet convergence mesa.log && ((TRIES <= MAXTRIES))
 while [ ! -f final.profile.GYRE ] && ((TRIES <= MAXTRIES))
 do
-    python3 ../../../../scripts/modify_Tc.py inlist_run 1000 -d
+    python3 ../../../scripts/modify_Tc.py inlist_run 1000 -d
     ((TRIES++))
     echo TRY $TRIES > mesa.log
     ./rn >> mesa.log

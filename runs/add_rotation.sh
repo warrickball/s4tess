@@ -12,7 +12,5 @@ fi
 OLDPWD=$(pwd)
 if [ ! -f $1/final.profile.GYRE.rot ]
 then
-    cd $1
-    python3 ../../../../scripts/add_rotation.py final.profile.GYRE LOGS/history.data --no-env-noise
-    cd $OLDPWD
+    python3 ../scripts/add_rotation.py $1/final.profile.GYRE $1/LOGS/history.data --no-env-noise
 fi
