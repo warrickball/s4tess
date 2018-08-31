@@ -3,7 +3,7 @@
 import numpy as np
 import AADG3
 from tools import load_txt, sector_starts
-from tomso import mesa
+from tomso import gyre, mesa
 from astropy.io import fits
 from datetime import datetime
 from argparse import ArgumentParser
@@ -103,6 +103,7 @@ meta_comments = {
 
 history_header, history_data = mesa.load_history(folder + '/LOGS/history.data')
 profile_header, profile_data = mesa.load_profile(folder + '/final.profile')
+gyre_header, gyre_profile = gyre.load_gyre(folder + '/final.profile.GYRE.rot')
 
 nml = AADG3.load_namelist(basename + '.in')
 
@@ -129,6 +130,9 @@ I = (profile_data['q'] > 0.9999)
 FeH = np.log10(np.sum(profile_data['z'][I]*dq[I])/np.sum(profile_data['x'][I]*dq[I])/(Zsun/Xsun))
 
 header['FE_H'] = (FeH, 'final metallicity [Fe/H]')
+
+header['OMEGA_C'] = (gyre_profile['Omega'][0]/2./np.pi*1e6, '[uHz] central rotation rate')
+header['OMEGA_E'] = (gyre_profile['Omega'][-1]/2./np.pi*1e6, '[uHz] surface rotation rate')
 
 header['VR'] = (meta['vr'], '[km/s] radial velocity')
 header['MU0'] = (meta['mu0'], 'distance modulus')
