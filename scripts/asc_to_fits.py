@@ -31,7 +31,7 @@ cads_per_sector = 720*137//5  # (cadences/day)*(days/sector)
 ascname = args.asc.split('/')[-1]
 folder = '/'.join(args.asc.split('/')[:-1])
 basename = folder + '/' + args.asc.split('/')[-2]
-sector = int(ascname.split('.')[0].split('_')[2])
+ID, sector, sec_rank = map(int, [ascname.split('.')[0].split('_')[i] for i in [0,2,3]])
 
 if args.output:
     fitsname = args.output
@@ -112,10 +112,17 @@ nml = AADG3.load_namelist(basename + '.in')
 header = fits.Header()
 header['ORIGIN'] = ('Uni. Birmingham', 'institution responsible for creating this file')
 header['DATE'] = (datetime.today().strftime('%Y-%m-%d'), 'file creation date')
+header['ID'] = (ID, 'ID number')
+header['SECTOR'] = (sector, 'TESS observing sector')
+header['SEC_RANK'] = (sec_rank, 'rank in this sector')
+header['TOT_RANK'] = (int(meta['Rank_Pmix']),
+                      "rank in whole sky")
+header['PMIX'] = (meta['P_mix'], 'detection probability')
+
 header['MASS'] = (history_data[-1]['star_mass'], '[solar masses] stellar mass')
 header['RADIUS'] = (10.**history_data[-1]['log_R'], '[solar radii] stellar radius')
 header['AGE'] = (history_data[-1]['star_age']/1e9, '[Gyr] stellar age')
-header['TEFF'] = (10.**history_data[-1]['log_Teff'], '[K] Effective temperature')
+header['TEFF'] = (10.**history_data[-1]['log_Teff'], '[K] effective temperature')
 header['LOGG'] = (history_data[-1]['log_g'], '[cm/s2] log10 surface gravity')
 header['LUM'] = (10.**history_data[-1]['log_L'], '[solar luminosities] stellar luminosity')
 header['X_C'] = (profile_data[-1]['x'], 'central hydrogen abundance')
@@ -131,22 +138,19 @@ FeH = np.log10(np.sum(profile_data['z'][I]*dq[I])/np.sum(profile_data['x'][I]*dq
 
 header['FE_H'] = (FeH, 'final metallicity [Fe/H]')
 
-header['OMEGA_C'] = (gyre_profile['Omega'][0]/2./np.pi*1e6, '[uHz] central rotation rate')
-header['OMEGA_E'] = (gyre_profile['Omega'][-1]/2./np.pi*1e6, '[uHz] surface rotation rate')
+header['OMEGA_C'] = (gyre_profile['Omega'][0]/2./np.pi*1e6, '[uHz] central/core rotation rate')
+header['OMEGA_E'] = (gyre_profile['Omega'][-1]/2./np.pi*1e6, '[uHz] surface/envelope rotation rate')
 
 header['VR'] = (meta['vr'], '[km/s] radial velocity')
 header['MU0'] = (meta['mu0'], 'distance modulus')
 header['AV'] = (meta['Av'], 'interstellar reddening')
 
-header['SECTOR'] = (sector, 'Observing sector')
 header['ELON'] = (meta['ELon'], '[degrees] ecliptic longitude')
 header['ELAT'] = (meta['ELat'], '[degrees] ecliptic latitude')
 header['GLON'] = (meta['gall'], '[degrees] galactic longitude')
 header['GLAT'] = (meta['galb'], '[degrees] galactic latitude')
 header['GC'] = (int(meta['Gc']), 'gal. comp.: 1-4 = thin/thick disc, halo, bulge')
 header['COMP'] = (int(meta['comp']), 'binarity: 0-2 = single, primary, secondary')
-header['PMIX'] = (meta['P_mix'], 'detection probability')
-header['TOT_RANK'] = (int(meta['Rank_Pmix']), 'rank across the whole sample')
 header['SIGMA'] = (meta['sigma'], '[ppm] white noise amplitude')
 
 header['SEED'] = (nml['user_seed'], 'seed for random number generator')
@@ -157,7 +161,10 @@ header['INC'] = (nml['inclination'], '[degrees] inclination')
 
 # lightcurve data for FITS output
 
-flux = np.loadtxt(args.asc)
+# flux = np.loadtxt(args.asc)
+with open(args.asc, 'r') as f:
+    flux = np.array([float(line) for line in f.readlines()])
+
 data = np.zeros(len(flux), dtype=[('TIME', '>f8'), ('FLUX', '>f4'), ('CADENCENO', '>i4')])
 data['FLUX'] = flux
 data['CADENCENO'] = sector_starts[sector] + np.arange(len(flux), dtype=int)
