@@ -4,9 +4,9 @@ import numpy as np
 from tools import load_txt, sector_starts
 from argparse import ArgumentParser
 
-def vprint(*print_args, **kwargs):
+def vprint(*print_args):
     if args.verbose:
-        print(*print_args, **kwargs)
+        print(*print_args, end='', flush=True)
 
 parser = ArgumentParser()
 parser.add_argument('folder', type=str,
@@ -37,4 +37,4 @@ for sector, rank in enumerate(ranks):
                   % (args.folder, basename, sector, rank), 'w') as f:
             f.writelines(lines[start:end])
                 
-vprint('\nDone.')
+vprint('Done.\n')
