@@ -5,8 +5,7 @@
 # e.g. sbatch --export=RUN="alpha" --array=0-99 MESA_sector_array.slurm
 
 #SBATCH --nodes 1
-#SBATCH --tasks 1
-#SBATCH --cpus-per-task 2
+#SBATCH --ntasks 2
 #SBATCH --mem 4G
 #SBATCH --time 00:40:00
 #SBATCH --output slurm/MESA_sector_array_%A_%a.out

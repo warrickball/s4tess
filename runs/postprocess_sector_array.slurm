@@ -5,16 +5,16 @@
 # e.g. sbatch --export=RUN="alpha" --array=0-99 AADG3_sector_array.slurm
 
 #SBATCH --nodes 1
-#SBATCH --tasks 1
-#SBATCH --cpus-per-task 1
+#SBATCH --ntasks 1
 #SBATCH --mem 256M
 #SBATCH --time 00:10:00
 #SBATCH --output slurm/postprocess_sector_array_%A_%a.out
 #SBATCH --error slurm/postprocess_sector_array_%A_%a.err
 
-
 module purge; module load bluebear  # this line is required
 module load scipy/0.19.0-python-3.5.2
+
+# export /rds/homes/b/ballwh/python/
 
 echo $RUN
 ID=$(printf "%05d" $SLURM_ARRAY_TASK_ID)

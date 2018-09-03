@@ -72,7 +72,7 @@
 	freq_max = 0.95
 	freq_min_units = 'ACOUSTIC_CUTOFF'
 	freq_max_units = 'ACOUSTIC_CUTOFF'
-	n_freq = 10000
+	n_freq = 14000
 	tag_list = 'l=3'
 /
 

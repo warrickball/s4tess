@@ -5,9 +5,9 @@
 # e.g. sbatch --export=RUN="alpha" --array=0-99 AADG3_sector_array.slurm
 
 #SBATCH --nodes 1
-#SBATCH --tasks 1
+#SBATCH --ntasks 1
 #SBATCH --mem 1G
-#SBATCH --time 01:00:00
+#SBATCH --time 01:30:00
 #SBATCH --output slurm/AADG3_sector_array_%A_%a.out
 #SBATCH --error slurm/AADG3_sector_array_%A_%a.err
 

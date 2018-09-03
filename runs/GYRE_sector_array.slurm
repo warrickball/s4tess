@@ -5,9 +5,9 @@
 # e.g. sbatch --export=RUN="alpha" --array=0-99 GYRE_sector_array.slurm
 
 #SBATCH --nodes 1
-#SBATCH --tasks 1
+#SBATCH --ntasks 1
 #SBATCH --mem 1G
-#SBATCH --time 00:30:00
+#SBATCH --time 00:40:00
 #SBATCH --output slurm/GYRE_sector_array_%A_%a.out
 #SBATCH --error slurm/GYRE_sector_array_%A_%a.err
 
