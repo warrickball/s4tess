@@ -1,4 +1,8 @@
-# Version 0
+# Results
+
+Each folder contains a run of the catalogue-making pipeline below.
+
+* ``alpha/`` is the version that was submitted for refereeing.
 
 ## Cross matching and extracting data from ATL and TRILEGAL
 
@@ -8,6 +12,8 @@ change.
 
     mkdir data
     python3 ../scripts/get_metadata.py ../data/atl.npy ../data/tri.npy data/meta.npy -v -N 1000
+
+``atl.npy`` and ``tri.npy`` are enormous and not part of this repo.
 
 ## Workflow
 
