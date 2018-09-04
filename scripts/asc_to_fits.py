@@ -165,10 +165,10 @@ header['INC'] = (nml['inclination'], '[degrees] inclination')
 with open(args.asc, 'r') as f:
     flux = np.array([float(line) for line in f.readlines()])
 
-data = np.zeros(len(flux), dtype=[('TIME', '>f8'), ('FLUX', '>f4'), ('CADENCENO', '>i4')])
+data = np.zeros(len(flux), dtype=[('TIME', '>f8'), ('FLUX', '>f4'), ('CADENCE_NO', '>i4')])
 data['FLUX'] = flux
-data['CADENCENO'] = sector_starts[sector] + np.arange(len(flux), dtype=int)
-data['TIME'] = 120.0*data['CADENCENO']/86400.0
+data['CADENCE_NO'] = sector_starts[sector] + np.arange(len(flux), dtype=int)
+data['TIME'] = 120.0*data['CADENCE_NO']/86400.0
 
 data_fits = fits.BinTableHDU(data)
 data_fits.header['TTYPE1'] = (data_fits.header['TTYPE1'], 'column title: data timestamp')
