@@ -82,6 +82,7 @@ else:
     raise ValueError("Can't tell if star is in northern or southern hemisphere! "
                      "Expected to find either 'north' or 'south' in folder name.")
 
+vis = np.array([1.0, 1.52355, 0.565349, 0.0361707])
 namelist['n_relax'] = 6*720
 namelist['n_fine'] = 50
 namelist['sig'] = sig
@@ -91,9 +92,12 @@ namelist['inclination'] = np.degrees(np.arccos(np.random.rand()))
 namelist['cycle_period'] = 100.0
 namelist['cycle_phase'] = 0.0
 namelist['nuac'] = 0.0
-namelist['p(1)'] = 1.52355
-namelist['p(2)'] = 0.565349
-namelist['p(3)'] = 0.0361707
+# namelist['p(1)'] = 1.52355
+# namelist['p(2)'] = 0.565349
+# namelist['p(3)'] = 0.0361707
+for i in range(1, 4):
+    namelist['p(%i)' % i] = vis[i]
+    
 namelist['add_granulation'] = True
 namelist['modes_filename'] = modes_filename
 namelist['rotation_filename'] = rotation_filename
@@ -133,8 +137,10 @@ p25 = [-3.71033159e+00,  1.07268220e-03,  1.88285544e-04, -7.20902433e+01,
 width = np.exp(logW_meta(nu, numax, Teff, *p25))/Q
 
 H = Henv*np.exp(-(nu-numax)**2/2./cenv**2)/Q
-amp2 = H*Dnu
-I = H > args.min_H
+power = H*Dnu
+height = 2./np.pi*power/width*vis[l]
+bkg = 4.*namelist['sig']**2*namelist['tau']/(1.0+(1e-6*nu*namelist['tau']*2.*np.pi)**2)/2e6
+I = height/bkg > args.min_H
 
 # Doppler shift the frequencies
 TAU = 2*np.pi
@@ -147,7 +153,7 @@ c = 299792.458
 nu = nu*np.sqrt((1-v/c)/(1+v/c))
 
 np.savetxt(args.folder + '/' + modes_filename, 
-           np.vstack([l, n, nu, width, amp2, 0.0*nu]).T[I],
+           np.vstack([l, n, nu, width, power, 0.0*nu]).T[I],
            fmt=['%2i','  %5i','  %12.7e','  %12.7e','  %12.7e','  %12.8e'])
 
 if args.splitting >= 0:
