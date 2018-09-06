@@ -18,6 +18,8 @@ parser.add_argument('-o', '--output', type=str, default=None,
                     "with `.asc` replaced with `.fits`.  If the input filename "
                     "doesn't end with `.asc`, the output file is just the input "
                     "filename with `.fits` appended.")
+parser.add_argument('--fortran-index', action='store_true',
+                    help="modifies all the indices to start from 1 instead of 0")
 parser.add_argument('--skip-test', action='store_true',
                     help="don't test the FITS file after it's written")
 # args = parser.parse_args(['../runs/v0/south/00000/00000_WN_11_0000.asc'])
@@ -36,10 +38,14 @@ ID, sector, sec_rank = map(int, [ascname.split('.')[0].split('_')[i] for i in [0
 if args.output:
     fitsname = args.output
 else:
-    if args.asc.endswith('.asc'):
-        fitsname = args.asc[:-4] + '.fits'
+    if args.fortran_index:
+        fitsname = folder + '/%05i_WN_%02i_%04i.fits' % (ID+1, sector+1, sec_rank+1)
     else:
-        fitsname = args.asc + '.fits'
+        if args.asc.endswith('.asc'):
+            fitsname = args.asc[:-4] + '.fits'
+        else:
+            fitsname = args.asc + '.fits'
+        
 
 # tri = {}  # TRILEGAL data
 # with open(basename + '.tri', 'r') as f:
@@ -112,11 +118,17 @@ nml = AADG3.load_namelist(basename + '.in')
 header = fits.Header()
 header['ORIGIN'] = ('Uni. Birmingham', 'institution responsible for creating this file')
 header['DATE'] = (datetime.today().strftime('%Y-%m-%d'), 'file creation date')
-header['ID'] = (ID, 'ID number')
-header['SECTOR'] = (sector, 'TESS observing sector')
-header['SEC_RANK'] = (sec_rank, 'rank in this sector')
-header['TOT_RANK'] = (int(meta['Rank_Pmix']),
-                      "rank in whole sky")
+if args.fortran_index:
+    header['ID'] = (ID+1, 'ID number')
+    header['SECTOR'] = (sector+1, 'TESS observing sector')
+    header['SEC_RANK'] = (sec_rank+1, 'rank in this sector')
+    header['TOT_RANK'] = (int(meta['Rank_Pmix']), "rank in whole sky")
+else:
+    header['ID'] = (ID, 'ID number')
+    header['SECTOR'] = (sector, 'TESS observing sector')
+    header['SEC_RANK'] = (sec_rank, 'rank in this sector')
+    header['TOT_RANK'] = (int(meta['Rank_Pmix'])-1, "rank in whole sky")
+
 header['PMIX'] = (meta['P_mix'], 'detection probability')
 
 header['MASS'] = (history_data[-1]['star_mass'], '[solar masses] stellar mass')

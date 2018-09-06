@@ -4,6 +4,11 @@ Each folder contains a run of the catalogue-making pipeline below.
 
 * ``alpha/`` is the version that was submitted for refereeing.
 
+Everything is Python-indexed (i.e. indices start from 0) while working
+internally.  Only the final FITS files are Fortran-indexed
+(i.e. indices start from 1).  The script ``asc_to_fits.py`` handles all
+of this change.
+
 ## Cross matching and extracting data from ATL and TRILEGAL
 
 The first few steps only need to be carried out once after which input
@@ -74,9 +79,8 @@ Skips folders where ``"$ID"_WN.asc`` doesn't exist.
 
 ### Convert output to FITS
 
-    ls alpha/000[01][0-9]/*_WN_*.asc | xargs -t -n1 python3 ../scripts/asc_to_fits.py
+    ls alpha/000[01][0-9]/*_WN_*.asc | xargs -t -n1 python3 ../scripts/asc_to_fits.py --fortran-index
 
-### Save power spectra
+### Save FITS headers to table
 
-    ls alpha/000*/*_WN_*.asc | xargs -n1 dirname | xargs -t -n1 bash save_AADG3_PS.sh
-
+    python3 ../scripts/fits_headers_to_csv.py alpha/fits_headers.csv alpha/*/*.fits
