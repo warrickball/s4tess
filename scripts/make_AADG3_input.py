@@ -82,19 +82,13 @@ else:
     raise ValueError("Can't tell if star is in northern or southern hemisphere! "
                      "Expected to find either 'north' or 'south' in folder name.")
 
-vis = np.array([1.0, 1.52355, 0.565349, 0.0361707])
+vis = np.array([1.0, 1.505, 0.62, 0.075])  # medians from Lund et al. (2017)
 namelist['n_relax'] = 6*720
 namelist['n_fine'] = 50
 namelist['sig'] = sig
 namelist['rho'] = 0.45
 namelist['tau'] = 250.0/(numax/3090.)
 namelist['inclination'] = np.degrees(np.arccos(np.random.rand()))
-namelist['cycle_period'] = 100.0
-namelist['cycle_phase'] = 0.0
-namelist['nuac'] = 0.0
-# namelist['p(1)'] = 1.52355
-# namelist['p(2)'] = 0.565349
-# namelist['p(3)'] = 0.0361707
 for i in range(1, 4):
     namelist['p(%i)' % i] = vis[i]
     
