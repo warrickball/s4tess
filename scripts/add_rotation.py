@@ -45,8 +45,8 @@ def P_angus(Teff, logg, t, noisy=False):
 
         P = Z + W*np.random.randn()
     elif Teff > BV_to_Teff(0.45):  # hot dwarf, eq. (7)
-        Y = 5.0 + 0.9*np.random.randn()  # mean
-        V = 2.1 + 0.8*np.random.randn()  # std
+        Y = 5.0 + 0.9*noisy*np.random.randn()  # mean
+        V = 2.1 + 0.8*noisy*np.random.randn()  # std
 
         P = Y + V*np.random.randn()
     else:                          # cool dwarf, eq. (6)
