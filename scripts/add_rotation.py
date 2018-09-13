@@ -85,7 +85,13 @@ P = P_angus(10.**history['log_Teff'][-1], 10.0, history['star_age'][-1]/1e6,
 Omega_env = 2.*np.pi/P
 profile['Omega'] = Omega_env
 
-if history['center_h1'][-1] < 1e-4 and np.log10(history['gravity'][-1]) < 3.8:
+if history['center_h1'][-1] < 1e-4: # and np.log10(history['gravity'][-1]) < 3.8:
+    # decrease rotation rate by a factor (R/R_TAMS)^2
+    R = 10.**history['log_R'][-1]
+    R_TAMS = 10.**history['log_R'][history['center_h1'] < 1e-4][0]
+    Omega_env = Omega_env/(R/R_TAMS)**2
+    profile['Omega'] = Omega_env
+    
     # fit to Mosser et al. (2012) data for RGB stars, Dnu > 12 uHz
     if args.no_core_noise:
         Omega_core = 0.375
