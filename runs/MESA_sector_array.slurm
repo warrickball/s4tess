@@ -28,9 +28,9 @@ TMPFILE=$(mktemp /scratch/${USER}_MESA_${SLURM_JOBID}_${ID}.XXXXXX)
 export MESA_DIR=/rds/projects/2017/ballwh-stellar-modelling/mesa/7385
 cd $SLURM_SUBMIT_DIR/$RUN/$(printf "%05d" $ID)
 pwd
-if [ -f final.profile ]
+if [ -f final.profile ] || [ -f final.profile.gz ]
 then
-    echo "ERROR: found $(pwd)/final.profile"
+    echo "ERROR: found $(pwd)/final.profile(.gz)"
     echo "       MESA appears to have already finished successfully."
     exit 1
 fi
@@ -63,3 +63,5 @@ do
     ./rn >> $TMPFILE
     mv -v $TMPFILE mesa.log
 done
+
+gzip -v final.profile
