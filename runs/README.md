@@ -27,7 +27,7 @@ In this example, we do the first 20 models.
 ### Make folders
 
     mkdir alpha
-    seq -w 0 00019 | xargs -I{} -t cp -r ../template/ alpha/{}
+    seq -w 00000 00019 | xargs -I{} -t cp -r ../template/ alpha/{}
 
 ### Export metadata
 
@@ -35,7 +35,7 @@ In this example, we do the first 20 models.
 
 ### Make MESA input
 
-    seq -w 0 00019 | xargs -t -I{} python3 ../scripts/make_MESA_input.py alpha/{}/{}.meta --Tc ../data/Tc.dat
+    seq -w 00000 00019 | xargs -t -I{} python3 ../scripts/make_MESA_input.py alpha/{}/{}.meta --Tc ../data/Tc.dat
 
 or
 
@@ -43,37 +43,37 @@ or
 
 ### Run MESA
 
-    sbatch --export=RUN="alpha" --array=0-19 MESA_sector_array.slurm
+    sbatch --export=RUN="alpha",START=0 --array=0-19 MESA_sector_array.slurm
 
 Skips folders in which ``final.profile.GYRE`` exists.
 
 ### Add rotation
 
-    seq -w 0 00019 | xargs -t -I{} bash add_rotation.sh alpha/{}
+    seq -w 00000 00019 | xargs -t -I{} bash add_rotation.sh alpha/{}
 
 ### Run GYRE
 
-    sbatch --export=RUN="alpha" --array=0-19 GYRE_sector_array.slurm
+    sbatch --export=RUN="alpha",START=0 --array=0-19 GYRE_sector_array.slurm
 
 Skips folders in which ``gyre_summary.txt`` exists.
 
 ### Make AADG3 input
 
-    seq -w 0 00019 | xargs -t -I{} python3 ../scripts/make_AADG3_input.py alpha/{}
+    seq -w 00000 00019 | xargs -t -I{} python3 ../scripts/make_AADG3_input.py alpha/{} --min-H 1e-4
 
 ### Run AADG3
 
-    sbatch --export=RUN="alpha" --array=0-19 AADG3_sector_array.slurm
+    sbatch --export=RUN="alpha",START=0 --array=0-19 AADG3_sector_array.slurm
 
 Skips folders in which ``"$ID".asc`` exists.
 
 ### Add white noise
 
-    seq -w 0 00019 | xargs -t -I{} python3 ../scripts/add_white_noise.py alpha/{}
+    seq -w 00000 00019 | xargs -t -I{} python3 ../scripts/add_white_noise.py alpha/{}
 
 ### Separate data into sectors
 
-    seq -w 0 00019 | xargs -t -I{} python3 ../scripts/sectorize.py alpha/{}
+    seq -w 00000 00019 | xargs -t -I{} python3 ../scripts/sectorize.py alpha/{}
 
 Skips folders where ``"$ID"_WN.asc`` doesn't exist.
 
