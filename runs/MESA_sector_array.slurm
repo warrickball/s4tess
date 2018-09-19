@@ -10,19 +10,27 @@
 #SBATCH --time 00:40:00
 #SBATCH --output slurm/MESA_sector_array_%A_%a.out
 #SBATCH --error slurm/MESA_sector_array_%A_%a.err
+#SBATCH --account=ballwh-stellar-modelling
 
 module purge; module load bluebear  # this line is required
 module load scipy/0.19.0-python-3.5.2
 
+ID=$(($START + $SLURM_ARRAY_TASK_ID))
+echo "ID               $ID"
+
 export OMP_NUM_THREADS=2
-echo OMP_NUM_THREADS $OMP_NUM_THREADS
-echo $RUN
+echo "OMP_NUM_THREADS  $OMP_NUM_THREADS"
+
+echo "RUN              $RUN"
+
+TMPFILE=$(mktemp /scratch/${USER}_MESA_${SLURM_JOBID}_${ID}.XXXXXX)
+
 export MESA_DIR=/rds/projects/2017/ballwh-stellar-modelling/mesa/7385
-cd $SLURM_SUBMIT_DIR/$RUN/$(printf "%05d" $SLURM_ARRAY_TASK_ID)
+cd $SLURM_SUBMIT_DIR/$RUN/$(printf "%05d" $ID)
 pwd
-if [ -f final.profile.GYRE ]
+if [ -f final.profile ]
 then
-    echo "ERROR: found $(pwd)/final.profile.GYRE"
+    echo "ERROR: found $(pwd)/final.profile"
     echo "       MESA appears to have already finished successfully."
     exit 1
 fi
@@ -43,13 +51,15 @@ else
     TRIES=1
 fi
 
-echo TRY $TRIES > mesa.log
-./rn >> mesa.log
+echo TRY $TRIES > $TMPFILE
+./rn >> $TMPFILE
+mv -v $TMPFILE mesa.log
 # while grep --quiet convergence mesa.log && ((TRIES <= MAXTRIES))
 while [ ! -f final.profile.GYRE ] && ((TRIES <= MAXTRIES))
 do
     python3 ../../../scripts/modify_Tc.py inlist_run 1000 -d
     ((TRIES++))
-    echo TRY $TRIES > mesa.log
-    ./rn >> mesa.log
+    echo TRY $TRIES > $TMPFILE
+    ./rn >> $TMPFILE
+    mv -v $TMPFILE mesa.log
 done

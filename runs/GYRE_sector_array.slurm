@@ -7,18 +7,24 @@
 #SBATCH --nodes 1
 #SBATCH --ntasks 1
 #SBATCH --mem 1G
-#SBATCH --time 00:40:00
+#SBATCH --time 00:45:00
 #SBATCH --output slurm/GYRE_sector_array_%A_%a.out
 #SBATCH --error slurm/GYRE_sector_array_%A_%a.err
+#SBATCH --account=ballwh-stellar-modelling
 
 module purge; module load bluebear  # this line is required
 
+ID=$(($START + $SLURM_ARRAY_TASK_ID))
+echo "ID               $ID"
+
 export OMP_NUM_THREADS=1
-echo OMP_NUM_THREADS $OMP_NUM_THREADS
-echo $RUN
+echo "OMP_NUM_THREADS  $OMP_NUM_THREADS"
+echo "RUN              $RUN"
+
+TMPFILE=$(mktemp /scratch/${USER}_MESA_${SLURM_JOBID}_${ID}.XXXXXX)
+
 export GYRE_DIR=/rds/homes/b/ballwh/code/gyre/fork
-ID=$(printf "%05d" $SLURM_ARRAY_TASK_ID)
-cd $SLURM_SUBMIT_DIR/$RUN/$ID
+cd $SLURM_SUBMIT_DIR/$RUN/$(printf "%05d" $ID)
 pwd
 if [ -f gyre_summary.txt ]
 then
@@ -27,4 +33,5 @@ then
     exit 1
 fi
 
-$GYRE_DIR/bin/gyre gyre.in > gyre.log
+$GYRE_DIR/bin/gyre gyre.in > $TMPFILE
+mv -v $TMPFILE gyre.log
