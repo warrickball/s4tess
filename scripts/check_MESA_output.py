@@ -19,7 +19,7 @@ args = parser.parse_args()
 for folder in args.folders:
     basename = folder.split('/')[-1]
 
-    header, history = mesa.load_history(folder + '/LOGS/history.data')
+    header, history = mesa.load_history(folder + '/LOGS/history.data.gz')
 
     with open('%s/%s.meta' % (folder, basename), 'r') as f:
         lines = [line.strip().split(' = ') for line in f.readlines()]

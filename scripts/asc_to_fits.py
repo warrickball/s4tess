@@ -107,8 +107,8 @@ meta_comments = {
     'Rank_Pmix': 'rank of average detection probability'
 }
 
-history_header, history_data = mesa.load_history(folder + '/LOGS/history.data')
-profile_header, profile_data = mesa.load_profile(folder + '/final.profile')
+history_header, history_data = mesa.load_history(folder + '/LOGS/history.data.gz')
+profile_header, profile_data = mesa.load_profile(folder + '/final.profile.gz')
 gyre_header, gyre_profile = gyre.load_gyre(folder + '/final.profile.GYRE.rot')
 
 nml = AADG3.load_namelist(basename + '.in')
