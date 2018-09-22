@@ -65,3 +65,4 @@ do
 done
 
 gzip -v final.profile
+gzip -v LOGS/history.data
