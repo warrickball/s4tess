@@ -24,7 +24,7 @@ The complete pipeline makes use of
 (specifically, [this fork](https://bitbucket.org/warrickball/gyre/commits/b24514643680e7b5c16a564cbe4bb16178e0610f?at=Edbeta_dx)
 of v5.2)
 * [AADG3](https://warrickball.github.io/AADG3) (v3.0.0a)
-* [TOMSO](https://tomso.readthedocs.io) (v0.0.7)
+* [TOMSO](https://tomso.readthedocs.io) (v0.0.9)
 
 as well as standard Python packages NumPy, SciPy, Astropy and
 Matplotlib.
