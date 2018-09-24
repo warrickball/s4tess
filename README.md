@@ -1,14 +1,14 @@
 # A synthetic sample of short-cadence solar-like oscillators for TESS (S4TESS)
 
 This repository contains the scripts used to compute the mock
-catalogue of TESS targets by Ball et al. (2018, in prep).
+catalogue of TESS targets by Ball et al. (2018, submitted).
 
     @ARTICLE{s4tess,
        author = {{Ball}, W.~H. and {Chaplin}, W.~J. and {Schofield}, M. and
                    {Miglio}, A. and {Bossini}, D. and {Davies}, G.~R. and
                    {Girardi}, L.},
         title = "{A synthetic sample of short-cadence solar-like oscillators for TESS}",
-      journal = {in prep.},
+      journal = {ApJS, submitted,},
          year = 2018
       }
 
