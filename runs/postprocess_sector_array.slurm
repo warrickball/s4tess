@@ -2,7 +2,7 @@
 
 # when using this command, you must export the RUN variable
 # and specify the array range
-# e.g. sbatch --export=RUN="alpha" --array=0-99 AADG3_sector_array.slurm
+# e.g. sbatch --export=RUN="alpha" --array=0-99 postprocess_sector_array.slurm
 
 #SBATCH --nodes 1
 #SBATCH --ntasks 1
@@ -24,4 +24,4 @@ ID5=$(printf "%05d" $ID)
 cd $SLURM_SUBMIT_DIR
 python3 ../scripts/add_white_noise.py $RUN/$ID5
 python3 ../scripts/sectorize.py $RUN/$ID5
-ls $RUN/$ID5/"$ID5"_WN_*.asc | xargs -t -n1 python3 ../scripts/asc_to_fits.py
+ls $RUN/$ID5/"$ID5"_WN_*.asc | xargs -t -n1 python3 ../scripts/asc_to_fits.py --fortran-index
