@@ -46,10 +46,11 @@ meta = load_txt(args.folder + '/%s.meta' % basename)
 
 header, summary = gyre.load_summary(args.folder + '/gyre_summary.txt')
 
-Lsun = 3.844e33
-Rsun = 6.96568e10
-Msun = 1.989e33
-Teff_sun = 5777.0
+Lsun = 3.8418e33
+Rsun = 6.9598e10
+Msun = 1.9892e33
+boltz = 5.6704e-5
+Teff_sun = (Lsun/(4.*np.pi*boltz*Rsun**2))**0.25
 numax_sun = 3090.0
 Dnu_sun = 135.1
 sig_sun = 60.0
