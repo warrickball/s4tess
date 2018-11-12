@@ -10,10 +10,11 @@ def vprint(*print_args):
 
 parser = ArgumentParser()
 parser.add_argument('folder', type=str,
-                    help="filename containing truth table of which "
-                    "stars occur in which sector")
-parser.add_argument('-v', '--verbose', action='store_const',
-                    const=True, default=False)
+                    help="folder containing output from AADG3")
+parser.add_argument('-v', '--verbose', action='store_true')
+parser.add_argument('--WN', action='store_true',
+                    help="use the lightcurve with white noise added "
+                    "(i.e. with `WN` in filename)")
 args = parser.parse_args()
 
 basename = args.folder.split('/')[-1]
@@ -22,7 +23,9 @@ ranks = [meta['rank_%02i' % i] for i in range(26)]
 
 vprint('Separating lightcurve in %s in sectors... ' % args.folder)
 
-with open(args.folder + '/' + basename + '_WN.asc', 'r') as f:
+suffix = '_WN' if args.WN else ''
+
+with open(args.folder + '/' + basename + suffix + '.asc', 'r') as f:
     lines = f.readlines()
 
 for sector, rank in enumerate(ranks):
@@ -33,8 +36,8 @@ for sector, rank in enumerate(ranks):
         start, end = sector_starts[sector:sector+2]
         start -= sector_starts[hemi]
         end -= sector_starts[hemi]
-        with open('%s/%s_WN_%02i_%04i.asc'
-                  % (args.folder, basename, sector, rank), 'w') as f:
+        with open('%s/%s%s_%02i_%04i.asc'
+                  % (args.folder, basename, suffix, sector, rank), 'w') as f:
             f.writelines(lines[start:end])
                 
 vprint('Done.\n')

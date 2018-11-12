@@ -119,7 +119,7 @@ wenv = 0.66*numax**0.88
 if Teff > Teff_sun:
     wenv *= 1.0 + 6e-4*(Teff-Teff_sun)
     
-cenv = wenv/2./np.sqrt(2.*np.log(2.))
+cenv = wenv/2./np.sqrt(2.*np.log(2.))  # FWHM -> sigma
 
 Q = E/np.interp(nu, nu[l==0], E[l==0])
 

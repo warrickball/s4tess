@@ -22,8 +22,24 @@ parser.add_argument('--fortran-index', action='store_true',
                     help="modifies all the indices to start from 1 instead of 0")
 parser.add_argument('--skip-test', action='store_true',
                     help="don't test the FITS file after it's written")
+parser.add_argument('--manual-id', type=int, nargs=3, default=None,
+                    help="override automatic identification with this triplet "
+                    "of ID, sector and sector rank")
 # args = parser.parse_args(['../runs/v0/south/00000/00000_WN_11_0000.asc'])
 args = parser.parse_args()
+
+# constants for AADG3 parameters
+Lsun = 3.8418e33
+Rsun = 6.9598e10
+Msun = 1.9892e33
+boltz = 5.6704e-5
+Teff_sun = (Lsun/(4.*np.pi*boltz*Rsun**2))**0.25
+numax_sun = 3090.0
+Dnu_sun = 135.1
+sig_sun = 60.0
+Amax_sun = 2.1        # ppm
+Tred_sun = 8907.0
+dT = 1250.0
 
 forms = {'J': 'column format: signed 32-bit integer',
          'D': 'column format: 64-bit floating point',
@@ -33,13 +49,19 @@ cads_per_sector = 720*137//5  # (cadences/day)*(days/sector)
 ascname = args.asc.split('/')[-1]
 folder = '/'.join(args.asc.split('/')[:-1])
 basename = folder + '/' + args.asc.split('/')[-2]
-ID, sector, sec_rank = map(int, [ascname.split('.')[0].split('_')[i] for i in [0,2,3]])
+
+ID, sector, sec_rank = 0, 0, 0
+
+if args.manual_id:
+    ID, sector, sec_rank = args.manual_id
+else:
+    ID, sector, sec_rank = map(int, [ascname.split('.')[0].split('_')[i] for i in [0,-2,-1]])
 
 if args.output:
     fitsname = args.output
 else:
     if args.fortran_index:
-        fitsname = folder + '/%05i_WN_%02i_%04i.fits' % (ID+1, sector+1, sec_rank+1)
+        fitsname = folder + '/%05i_%02i_%04i.fits' % (ID+1, sector+1, sec_rank+1)
     else:
         if args.asc.endswith('.asc'):
             fitsname = args.asc[:-4] + '.fits'
@@ -113,6 +135,21 @@ gyre_header, gyre_profile = gyre.load_gyre(folder + '/final.profile.GYRE.rot')
 
 nml = AADG3.load_namelist(basename + '.in')
 
+L = 10.**history_data['log_L'][-1]
+R = 10.**history_data[-1]['log_R']
+M = history_data[-1]['star_mass']
+Teff = 10.**history_data[-1]['log_Teff']
+numax = numax_sun*(M/R**2/(Teff/Teff_sun)**0.5)
+Dnu = Dnu_sun*np.sqrt(M/R**3)
+
+Tred = Tred_sun*L**-0.093
+beta = 1.0 - np.exp((Teff-Tred)/dT)
+Amax = Amax_sun*beta*L/M*(Teff/Teff_sun)**-2
+Henv = Amax**2/Dnu
+wenv = 0.66*numax**0.88
+if Teff > Teff_sun:
+    wenv *= 1.0 + 6e-4*(Teff-Teff_sun)
+
 # header data for FITS output
     
 header = fits.Header()
@@ -131,12 +168,12 @@ else:
 
 header['PMIX'] = (meta['P_mix'], 'detection probability')
 
-header['MASS'] = (history_data[-1]['star_mass'], '[solar masses] stellar mass')
-header['RADIUS'] = (10.**history_data[-1]['log_R'], '[solar radii] stellar radius')
+header['MASS'] = (M, '[solar masses] stellar mass')
+header['RADIUS'] = (R, '[solar radii] stellar radius')
 header['AGE'] = (history_data[-1]['star_age']/1e9, '[Gyr] stellar age')
-header['TEFF'] = (10.**history_data[-1]['log_Teff'], '[K] effective temperature')
+header['TEFF'] = (Teff, '[K] effective temperature')
 header['LOGG'] = (history_data[-1]['log_g'], '[cm/s2] log10 surface gravity')
-header['LUM'] = (10.**history_data[-1]['log_L'], '[solar luminosities] stellar luminosity')
+header['LUM'] = (L, '[solar luminosities] stellar luminosity')
 header['X_C'] = (profile_data[-1]['x'], 'central hydrogen abundance')
 header['Y_C'] = (profile_data[-1]['y'], 'central helium abundance')
 header['Z_INI'] = (history_header['initial_z'][()], 'initial metal abundance')
@@ -150,12 +187,20 @@ FeH = np.log10(np.sum(profile_data['z'][I]*dq[I])/np.sum(profile_data['x'][I]*dq
 
 header['FE_H'] = (FeH, 'final metallicity [Fe/H]')
 
+header['DELTA_NU'] = (Dnu, '[uHz] large separation (scaling rel.)')
+header['NU_MAX'] = (numax, '[uHz] freq. of max. osc. power (scaling rel.)')
+header['BETA'] = (beta, 'red edge amplitude correction factor')
+header['A_RMSMAX'] = (Amax, '[ppm] maximum rms power of radial modes')
+header['GAM_ENV'] = (wenv, '[uHz] FWHM of oscillation power envelope')
+
 header['OMEGA_C'] = (gyre_profile['Omega'][0]/2./np.pi*1e6, '[uHz] central/core rotation rate')
 header['OMEGA_E'] = (gyre_profile['Omega'][-1]/2./np.pi*1e6, '[uHz] surface/envelope rotation rate')
 
 header['VR'] = (meta['vr'], '[km/s] radial velocity')
 header['MU0'] = (meta['mu0'], 'distance modulus')
 header['AV'] = (meta['Av'], 'interstellar reddening')
+header['TESS_MAG'] = (meta['TESSmag'], 'TRILEGAL magnitude in TESS bandpass')
+header['I_MAG'] = (meta['TESSmag'], 'TRILEGAL magnitude in i-band')
 
 header['ELON'] = (meta['ELon'], '[degrees] ecliptic longitude')
 header['ELAT'] = (meta['ELat'], '[degrees] ecliptic latitude')
@@ -168,7 +213,7 @@ header['SIGMA'] = (meta['sigma'], '[ppm] white noise amplitude')
 header['SEED'] = (nml['user_seed'], 'seed for random number generator')
 header['N_CADS'] = (nml['n_cadences'], 'number of cadences in hemisphere')
 header['GRAN_SIG'] = (nml['sig'], '[ppm] granulation amplitude')
-header['GRAN_TAU'] = (nml['tau'], '[s] granulationtimescale')
+header['GRAN_TAU'] = (nml['tau'], '[s] granulation timescale')
 header['INC'] = (nml['inclination'], '[degrees] inclination')
 
 # lightcurve data for FITS output
@@ -177,12 +222,12 @@ header['INC'] = (nml['inclination'], '[degrees] inclination')
 with open(args.asc, 'r') as f:
     flux = np.array([float(line) for line in f.readlines()])
 
-data = np.zeros(len(flux), dtype=[('TIME', '>f8'), ('FLUX', '>f4'), ('CADENCE_NO', '>i4')])
+data = np.zeros(len(flux), dtype=[('TIME', '>f8'), ('FLUX', '>f4'), ('CADENCENO', '>i4')])
 data['FLUX'] = flux
-data['CADENCE_NO'] = sector_starts[sector] + np.arange(len(flux), dtype=int)
-data['TIME'] = 120.0*data['CADENCE_NO']/86400.0
+data['CADENCENO'] = sector_starts[sector] + np.arange(len(flux), dtype=int)
+data['TIME'] = 120.0*data['CADENCENO']/86400.0
 
-data_fits = fits.BinTableHDU(data)
+data_fits = fits.BinTableHDU(data, name='LIGHTCURVE')
 data_fits.header['TTYPE1'] = (data_fits.header['TTYPE1'], 'column title: data timestamp')
 data_fits.header['TUNIT1'] = ('d', 'column unit: days')
 data_fits.header['TTYPE2'] = (data_fits.header['TTYPE2'], 'column title: intensity variation')
@@ -203,7 +248,7 @@ modes = np.loadtxt(basename + '.con',
 rot = np.genfromtxt(basename + '.rot', names=['n', 'l', 'm', 'dnu'])
 modes['ROT'][modes['L']>0] = rot[rot['m']==1]['dnu']
 
-modes_fits = fits.BinTableHDU(modes)
+modes_fits = fits.BinTableHDU(modes, name='MODES')
 modes_fits.header['TTYPE1'] = (modes_fits.header['TTYPE1'], 'column title: angular degree')
 modes_fits.header['TTYPE2'] = (modes_fits.header['TTYPE2'], 'column title: radial order')
 modes_fits.header['TTYPE3'] = (modes_fits.header['TTYPE3'], 'column title: mode frequency')
