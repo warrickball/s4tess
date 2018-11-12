@@ -15,7 +15,7 @@ catalogue of TESS targets by Ball et al. (2018, submitted).
 The output
 files from various states of the project are available
 [here](https://zenodo.org/record/1470155) on
-[Zenod](https://zenodo.org).
+[Zenodo](https://zenodo.org).
 
 The complete pipeline makes use of
 
