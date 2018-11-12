@@ -8,14 +8,14 @@ catalogue of TESS targets by Ball et al. (2018, submitted).
                    {Miglio}, A. and {Bossini}, D. and {Davies}, G.~R. and
                    {Girardi}, L.},
         title = "{A synthetic sample of short-cadence solar-like oscillators for TESS}",
-      journal = {ApJS, submitted,},
+      journal = {ApJS, accepted,},
          year = 2018
       }
 
 The output
 files from various states of the project are available
-[here](https://figshare.com/account/home#/projects/38093) on
-[FigShare](https://figshare.com).
+[here](https://zenodo.org/record/1470155) on
+[Zenod](https://zenodo.org).
 
 The complete pipeline makes use of
 
@@ -26,5 +26,7 @@ of v5.2)
 * [AADG3](https://warrickball.github.io/AADG3) (v3.0.0a)
 * [TOMSO](https://tomso.readthedocs.io) (v0.0.9)
 
-as well as standard Python packages NumPy, SciPy, Astropy and
-Matplotlib.
+as well as standard Python packages [NumPy](http://www.numpy.org/),
+[SciPy](https://www.scipy.org/scipylib/index.html),
+[Astropy](http://www.astropy.org/) and
+[Matplotlib](https://matplotlib.org/).
